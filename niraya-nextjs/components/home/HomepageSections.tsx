@@ -12,6 +12,33 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { formatINR } from "@/lib/formatCurrency";
 import { useCartStore } from "@/store/cart";
 
+// Custom hook defined at module scope to satisfy react-hooks/rules-of-hooks
+function useCarousel() {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+  const update = () => {
+    const el = ref.current; if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanPrev(scrollLeft > 0);
+    setCanNext(scrollLeft + clientWidth < scrollWidth - 1);
+  };
+  useEffect(() => {
+    update();
+    const el = ref.current; if (!el) return;
+    const onScroll = () => update();
+    const onResize = () => update();
+    el.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    return () => { el.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onResize); };
+  }, []);
+  const scrollByAmt = (dir: 1 | -1) => {
+    const el = ref.current; if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth * 0.9, behavior: 'smooth' });
+  };
+  return { ref, canPrev, canNext, scrollByAmt } as const;
+}
+
 export default function HomepageSections() {
   // Simple quick view handler state (optional)
   const [quickView, setQuickView] = useState<Product | null>(null);
@@ -28,34 +55,8 @@ export default function HomepageSections() {
   });
 
   // Carousel util hooks
-  const makeCarousel = () => {
-    const ref = useRef<HTMLDivElement | null>(null);
-    const [canPrev, setCanPrev] = useState(false);
-    const [canNext, setCanNext] = useState(false);
-    const update = () => {
-      const el = ref.current; if (!el) return;
-      const { scrollLeft, scrollWidth, clientWidth } = el;
-      setCanPrev(scrollLeft > 0);
-      setCanNext(scrollLeft + clientWidth < scrollWidth - 1);
-    };
-    useEffect(() => {
-      update();
-      const el = ref.current; if (!el) return;
-      const onScroll = () => update();
-      const onResize = () => update();
-      el.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', onResize);
-      return () => { el.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onResize); };
-    }, []);
-    const scrollByAmt = (dir: 1 | -1) => {
-      const el = ref.current; if (!el) return;
-      el.scrollBy({ left: dir * el.clientWidth * 0.9, behavior: 'smooth' });
-    };
-    return { ref, canPrev, canNext, scrollByAmt } as const;
-  };
-
-  const c1 = makeCarousel();
-  const c2 = makeCarousel();
+  const c1 = useCarousel();
+  const c2 = useCarousel();
 
   return (
     <section className="py-10">

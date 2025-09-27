@@ -49,8 +49,7 @@ const ProductCard = ({
 
   return (
     <Card
-      className="group relative product-card border-none shadow-none bg-transparent overflow-hidden"
-      className="product-card group border-none shadow-none bg-transparent overflow-hidden"
+      className="product-card group relative border-none shadow-none bg-transparent overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
