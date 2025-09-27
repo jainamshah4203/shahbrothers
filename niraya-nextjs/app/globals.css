@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* NIRAYA Fashion Design System - Premium feminine aesthetic */
+
+@layer base {
+  :root {
+    /* Core Brand Colors - Sophisticated neutrals with feminine touches */
+    --background: 0 0% 99%;
+    --foreground: 30 8% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 30 8% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 8% 15%;
+
+    /* Primary - Warm charcoal for elegance */
+    --primary: 30 8% 15%;
+    --primary-foreground: 0 0% 98%;
+
+    /* Secondary - Soft blush for feminine touch */
+    --secondary: 15 25% 92%;
+    --secondary-foreground: 30 8% 15%;
+
+    /* Muted - Warm grays */
+    --muted: 20 10% 95%;
+    --muted-foreground: 30 5% 45%;
+
+    /* Accent - Dusty rose for highlights */
+    --accent: 15 30% 85%;
+    --accent-foreground: 30 8% 15%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 20 15% 88%;
+    --input: 20 15% 88%;
+    --ring: 30 8% 15%;
+
+    --radius: 0.75rem;
+
+    /* Fashion-specific tokens */
+    --hero-gradient: linear-gradient(135deg, hsl(15 25% 92%), hsl(20 20% 96%));
+    --product-hover: 15 20% 90%;
+    --luxury-gold: 45 95% 70%;
+    --sale-red: 0 85% 65%;
+  }
+
+  .dark {
+    --background: 30 8% 7%;
+    --foreground: 20 20% 95%;
+
+    --card: 30 8% 8%;
+    --card-foreground: 20 20% 95%;
+
+    --popover: 30 8% 8%;
+    --popover-foreground: 20 20% 95%;
+
+    --primary: 20 20% 95%;
+    --primary-foreground: 30 8% 15%;
+
+    --secondary: 30 8% 12%;
+    --secondary-foreground: 20 20% 95%;
+
+    --muted: 30 8% 12%;
+    --muted-foreground: 20 10% 60%;
+
+    --accent: 30 8% 15%;
+    --accent-foreground: 20 20% 95%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 30 8% 15%;
+    --input: 30 8% 15%;
+    --ring: 20 20% 95%;
+
+    /* Dark mode fashion tokens */
+    --hero-gradient: linear-gradient(135deg, hsl(30 8% 10%), hsl(30 8% 8%));
+    --product-hover: 30 8% 12%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Typography Scale */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl;
+  }
+
+  h5 {
+    @apply text-lg md:text-xl;
+  }
+
+  h6 {
+    @apply text-base md:text-lg;
+  }
+
+  /* Premium button styles */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 
+           px-8 py-3 rounded-md font-medium transition-all duration-200
+           shadow-sm hover:shadow-md;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80
+           px-8 py-3 rounded-md font-medium transition-all duration-200
+           border border-border;
+  }
+
+  .btn-ghost {
+    @apply text-foreground hover:bg-accent hover:text-accent-foreground
+           px-8 py-3 rounded-md font-medium transition-all duration-200;
+  }
+
+  /* Product card enhancements */
+  .product-card {
+    @apply bg-card rounded-lg overflow-hidden shadow-sm 
+           hover:shadow-md transition-all duration-300
+           border border-border/50;
+  }
+
+  .product-card:hover {
+    @apply scale-[1.02] border-border;
+  }
+
+  /* Hero section styling */
+  .hero-gradient {
+    background: var(--hero-gradient);
+  }
+
+  /* Collection grid responsive */
+  .collection-grid {
+    @apply grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .featured-grid {
+    @apply grid gap-8 grid-cols-1 lg:grid-cols-2;
+  }
+
+  /* Premium focus styles */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+
+  /* Smooth animations */
+  .animate-fadeIn {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .animate-slideUp {
+    animation: slideUp 0.6s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { 
+      opacity: 0; 
+      transform: translateY(20px); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  }
+
+  /* Custom scrollbar for webkit browsers */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-muted rounded-lg;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-lg;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+
+  /* Instagram feed specific styles */
+  .instagram-post {
+    @apply relative overflow-hidden rounded-lg aspect-square;
+  }
+
+  .instagram-overlay {
+    @apply absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 
+           transition-opacity duration-300 flex items-center justify-center;
+  }
+
+  /* Navigation enhancements */
+  .nav-link {
+    @apply text-foreground/80 hover:text-foreground transition-colors duration-200
+           relative py-2 px-1;
+  }
+
+  .nav-link::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300;
+  }
+
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+
+  /* Footer styling */
+  .footer-section h4 {
+    @apply text-sm font-semibold tracking-wider uppercase text-foreground/90 mb-4;
+  }
+
+  .footer-link {
+    @apply text-muted-foreground hover:text-foreground transition-colors duration-200
+           block py-1;
+  }
+
+  /* Responsive utilities */
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-spacing {
+    @apply py-16 md:py-24 lg:py-32;
+  }
+
+  /* Loading states */
+  .loading-skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+
+  /* Premium spacing system */
+  .space-premium > * + * {
+    @apply mt-8;
+  }
+
+  /* Mobile menu styling */
+  .mobile-menu-item {
+    @apply block w-full text-left px-4 py-3 text-foreground hover:bg-accent
+           transition-colors duration-200;
+  }
+}
