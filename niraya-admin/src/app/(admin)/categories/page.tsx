@@ -48,7 +48,7 @@ export default function CategoriesPage() {
     <div className="p-3 md:p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">All Categories</h1>
-        <Link href="/categories/new">
+        <Link href="/(admin)/categories/new">
           <Button size="sm">Add Category</Button>
         </Link>
       </div>
