@@ -35,13 +35,21 @@ app.use(helmet());
 // CORS
 const corsOriginEnv = process.env.CORS_ORIGIN || 'http://localhost:3000';
 const allowedOrigins = corsOriginEnv.split(',').map(o => o.trim()).filter(Boolean);
-console.log('CORS allowed origins:', allowedOrigins);
+const allowAll = allowedOrigins.length === 1 && allowedOrigins[0] === '*';
+// Support simple wildcard suffixes like '*.vercel.app'
+const wildcardSuffixes = allowedOrigins
+  .filter((o) => o.startsWith('*.'))
+  .map((o) => o.slice(1)); // '.vercel.app'
+
+console.log('CORS allowed origins:', allowAll ? ['<ALL>'] : allowedOrigins);
 
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
     // Allow server-to-server or tools without an Origin header
     if (!origin) return callback(null, true);
+    if (allowAll) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (wildcardSuffixes.some((suffix) => origin.endsWith(suffix))) return callback(null, true);
     return callback(new Error(`Not allowed by CORS: ${origin}`));
   },
   credentials: true,
