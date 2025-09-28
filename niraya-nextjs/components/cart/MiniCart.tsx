@@ -45,7 +45,13 @@ export default function MiniCart() {
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-medium line-clamp-1">{i.snapshot.name}</div>
-                  <div className="text-xs text-muted-foreground">{i.size ?? ""} {i.color ?? ""}</div>
+                  {(i.size || i.color) && (
+                    <div className="text-xs text-muted-foreground">
+                      {i.size && <span>Size: {i.size}</span>}
+                      {i.size && i.color && <span>{" · "}</span>}
+                      {i.color && <span>Color: {i.color}</span>}
+                    </div>
+                  )}
                   <div className="mt-1 flex items-center justify-between">
                     {/* Show only unit price here; subtotal shown below */}
                     <div className="text-xs text-muted-foreground">

@@ -85,6 +85,8 @@ export default function BestSellersStrip() {
   const multi = (bestsellers?.length || 0) > 1;
 
   const [quickView, setQuickView] = useState<Product | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const addToCart = useCartStore((s: CartState) => s.addItem);
   const { toast } = useToast();
 
@@ -136,7 +138,7 @@ export default function BestSellersStrip() {
           </button>
         </div>
         {/* Quick View Modal */}
-        <Dialog open={!!quickView} onOpenChange={(open) => { if (!open) setQuickView(null); }}>
+        <Dialog open={!!quickView} onOpenChange={(open) => { if (!open) { setQuickView(null); setSelectedSize(null); setSelectedColor(null); } }}>
           <DialogContent className="max-w-3xl">
             {quickView && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -156,7 +158,12 @@ export default function BestSellersStrip() {
                       <div className="text-xs mb-2 text-muted-foreground">Size</div>
                       <div className="flex flex-wrap gap-2">
                         {quickView.sizes.map((s) => (
-                          <span key={s} className="px-3 py-1.5 rounded border text-xs">{s}</span>
+                          <button
+                            type="button"
+                            key={s}
+                            onClick={() => setSelectedSize(s)}
+                            className={`px-3 py-1.5 rounded border text-xs ${selectedSize === s ? 'bg-black text-white border-black' : 'hover:bg-accent'}`}
+                          >{s}</button>
                         ))}
                       </div>
                     </div>
@@ -168,7 +175,12 @@ export default function BestSellersStrip() {
                       <div className="text-xs mb-2 text-muted-foreground">Color</div>
                       <div className="flex flex-wrap gap-2">
                         {quickView.colors.map((c, idx) => (
-                          <span key={`${c}-${idx}`} className="px-3 py-1.5 rounded border text-xs">{c}</span>
+                          <button
+                            type="button"
+                            key={`${c}-${idx}`}
+                            onClick={() => setSelectedColor(c)}
+                            className={`px-3 py-1.5 rounded border text-xs ${selectedColor === c ? 'bg-black text-white border-black' : 'hover:bg-accent'}`}
+                          >{c}</button>
                         ))}
                       </div>
                     </div>
@@ -176,7 +188,20 @@ export default function BestSellersStrip() {
 
                   {/* Actions */}
                   <div className="mt-6">
-                    <Button onClick={() => { addToCart(quickView, { qty: 1 }); toast({ title: "Added to cart", description: quickView.name }); }} className="w-full">Add to Cart</Button>
+                    <Button
+                      onClick={() => {
+                        addToCart(quickView, { qty: 1, size: selectedSize || undefined, color: selectedColor || undefined });
+                        toast({ title: 'Added to cart', description: quickView.name });
+                        setQuickView(null);
+                        setSelectedSize(null);
+                        setSelectedColor(null);
+                      }}
+                      className="w-full"
+                      disabled={
+                        (Array.isArray(quickView.sizes) && quickView.sizes.length > 0 && !selectedSize) ||
+                        (Array.isArray(quickView.colors) && quickView.colors.length > 0 && !selectedColor)
+                      }
+                    >Add to Cart</Button>
                   </div>
                 </div>
               </div>
