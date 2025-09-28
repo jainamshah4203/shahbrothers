@@ -2,11 +2,13 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ApiCategory, fetchCategories, deleteCategory } from "@/services/categories";
 
 export default function CategoriesPage() {
+  const router = useRouter();
   const [items, setItems] = useState<ApiCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,9 +50,7 @@ export default function CategoriesPage() {
     <div className="p-3 md:p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">All Categories</h1>
-        <Link href="/(admin)/categories/new">
-          <Button size="sm">Add Category</Button>
-        </Link>
+        <Button type="button" size="sm" onClick={() => router.push('/categories/new')}>Add Category</Button>
       </div>
       <Card className="border-0 shadow-sm">
         <CardHeader>
