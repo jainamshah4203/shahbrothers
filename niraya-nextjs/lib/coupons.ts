@@ -18,10 +18,13 @@ export interface CouponValidationResponse {
 }
 
 export async function validateCoupon(code: string, cartTotal: number, userId?: string, email?: string): Promise<CouponValidationResponse> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-  
+  // Normalize base URL so '/api' is present exactly once
+  const RAW_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  const TRIMMED = RAW_BASE.replace(/\/$/, '');
+  const API_BASE = TRIMMED.endsWith('/api') ? TRIMMED : `${TRIMMED}/api`;
+
   try {
-    const response = await fetch(`${apiUrl}/coupons/validate`, {
+    const response = await fetch(`${API_BASE}/coupons/validate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
