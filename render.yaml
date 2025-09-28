@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: niraya-backend
+    env: node
+    plan: free
+    region: oregon
+    rootDir: niraya-backend
+    buildCommand: |
+      npm ci --legacy-peer-deps || npm install
+      npm run build
+    startCommand: node dist/index.js
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # Replace the values below with your real secrets in the Render dashboard after first deploy
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
