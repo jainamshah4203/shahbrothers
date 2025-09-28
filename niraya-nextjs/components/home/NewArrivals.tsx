@@ -203,11 +203,20 @@ const NewArrivals = () => {
                 {/* Actions */}
                 <div className="mt-6">
                   <Button
-                    onClick={() => handleAddToCart({
-                      ...quickView,
-                      sizes: quickView.sizes || [],
-                      colors: quickView.colors || [],
-                    })}
+                    onClick={() => {
+                      addToCart(
+                        {
+                          ...quickView,
+                          sizes: quickView.sizes || [],
+                          colors: quickView.colors || [],
+                        },
+                        { qty: 1, size: selectedSize || undefined, color: selectedColor || undefined }
+                      );
+                      toast({ title: "Added to cart", description: quickView.name });
+                      setQuickView(null);
+                      setSelectedSize(null);
+                      setSelectedColor(null);
+                    }}
                     className="w-full"
                     disabled={
                       (Array.isArray(quickView.sizes) && quickView.sizes.length > 0 && !selectedSize) ||

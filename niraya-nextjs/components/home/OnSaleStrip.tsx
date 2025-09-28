@@ -141,7 +141,13 @@ export default function OnSaleStrip() {
                   {/* Actions */}
                   <div className="mt-6">
                     <Button
-                      onClick={() => { addToCart(quickView, { qty: 1 }); toast({ title: 'Added to cart', description: quickView.name }); }}
+                      onClick={() => {
+                        addToCart(quickView, { qty: 1, size: selectedSize || undefined, color: selectedColor || undefined });
+                        toast({ title: 'Added to cart', description: quickView.name });
+                        setQuickView(null);
+                        setSelectedSize(null);
+                        setSelectedColor(null);
+                      }}
                       className="w-full"
                       disabled={
                         (Array.isArray(quickView.sizes) && quickView.sizes.length > 0 && !selectedSize) ||

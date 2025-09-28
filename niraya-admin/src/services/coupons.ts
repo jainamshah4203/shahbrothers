@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api";
+import { apiGet, apiPost, apiPut, apiDelete, API_BASE_URL } from "@/lib/api";
 
 export type CouponType = "percent" | "fixed";
 
@@ -59,7 +59,7 @@ export async function fetchCouponById(id: string): Promise<{ coupon: ApiCoupon }
 }
 
 export async function exportCoupons(): Promise<Blob> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/coupons/export`, {
+  const response = await fetch(`${API_BASE_URL}/coupons/export`, {
     method: 'GET',
     credentials: 'include',
   });

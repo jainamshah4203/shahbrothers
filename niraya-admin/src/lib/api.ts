@@ -1,4 +1,7 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+// Normalize base URL so '/api' is present exactly once
+const RAW_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const TRIMMED = RAW_BASE.replace(/\/$/, '');
+export const API_BASE_URL = TRIMMED.endsWith('/api') ? TRIMMED : `${TRIMMED}/api`;
 
 export async function apiGet<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE_URL}${path}`, {
