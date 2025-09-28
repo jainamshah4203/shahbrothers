@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Instagram, ExternalLink } from "lucide-react";
+import Image from "next/image";
 
 const InstagramFeed = () => {
   // Mock Instagram posts data
@@ -76,10 +77,12 @@ const InstagramFeed = () => {
               }}
             >
               <div className="relative aspect-square overflow-hidden rounded-lg">
-                <img
+                <Image
                   src={post.image}
                   alt={`Instagram post ${post.id}`}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  fill
+                  sizes="(max-width: 1024px) 33vw, 16vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">

@@ -146,7 +146,7 @@ export default function CollectionsClient({ products }: Props) {
     sp.set("page", "1");
     sp.set("perPage", "8");
     router.replace(`/collections?${sp.toString()}`);
-  }, [selectedCategories, selectedColors, selectedSizes, minPrice, maxPrice, sort]);
+  }, [selectedCategories, selectedColors, selectedSizes, minPrice, maxPrice, sort, router, searchParams]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">

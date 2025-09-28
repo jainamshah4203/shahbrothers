@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 const FeaturedCollections = () => {
   const collections = [
@@ -50,11 +51,14 @@ const FeaturedCollections = () => {
                 animationDelay: `${index * 0.2}s`,
               }}
             >
-              <div className="relative overflow-hidden">
-                <img
+              <div className="relative overflow-hidden h-80">
+                <Image
                   src={collection.image}
                   alt={collection.title}
-                  className="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-105"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 33vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  priority={index < 2}
                 />
                 {collection.isNew && (
                   <div className="absolute top-4 left-4 bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold rounded-full">

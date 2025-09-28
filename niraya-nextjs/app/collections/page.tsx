@@ -22,8 +22,8 @@ async function getProducts(filters: {
   }
 }
 
-export default async function CollectionsPage({ searchParams }: { searchParams?: Record<string, string | string[] | undefined> }) {
-  const sp = (await searchParams) || {};
+export default async function CollectionsPage({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
+  const sp = (await searchParams) ?? {};
   const toBool = (v: string | string[] | undefined) => typeof v === 'string' && /^(1|true|yes)$/i.test(v);
   const products = await getProducts({
     featured: toBool(sp.featured),

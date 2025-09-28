@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Product } from "@/types/product";
@@ -21,7 +21,13 @@ const NewArrivals = () => {
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
 
-  const updateButtons = () => {
+  // Fetch featured products (new arrivals or bestsellers) from backend
+  const { data: featuredProducts = [], isLoading, isError, error } = useQuery<Product[], Error>({
+    queryKey: ["featured-products", { limit: 8 }],
+    queryFn: () => fetchFeaturedProducts(8),
+  });
+
+  const updateButtons = useCallback(() => {
     const el = scrollerRef.current;
     if (!el) return;
     const { scrollLeft, scrollWidth, clientWidth } = el;
@@ -34,7 +40,7 @@ const NewArrivals = () => {
     }
     setCanPrev(scrollLeft > 0);
     setCanNext(scrollLeft + clientWidth < scrollWidth - 1);
-  };
+  }, [scrollerRef, featuredProducts]);
 
   useEffect(() => {
     updateButtons();
@@ -48,7 +54,7 @@ const NewArrivals = () => {
       el.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
     };
-  }, []);
+  }, [updateButtons]);
 
   const scrollByAmount = (dir: 1 | -1) => {
     const el = scrollerRef.current;
@@ -63,11 +69,6 @@ const NewArrivals = () => {
     el.scrollBy({ left: dir * amount, behavior: 'smooth' });
   };
 
-  // Fetch featured products (new arrivals or bestsellers) from backend
-  const { data: featuredProducts = [], isLoading, isError, error } = useQuery<Product[], Error>({
-    queryKey: ["featured-products", { limit: 8 }],
-    queryFn: () => fetchFeaturedProducts(8),
-  });
 
   const addToCart = useCartStore((s: CartState) => s.addItem);
   const addWishlist = useWishlistStore((s: WishlistState) => s.add);
