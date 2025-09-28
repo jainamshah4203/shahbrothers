@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useRef, useState } from "react";
 import { createProduct } from "@/services/products";
+import { fetchCategories, type ApiCategory } from "@/services/categories";
 import { SelectSearch } from "@/components/ui/select-search";
 import { useRouter } from "next/navigation";
 import { uploadManyToCloudinaryWithProgress, uploadManyToCloudinarySignedWithProgress } from "@/lib/upload";
@@ -15,7 +16,10 @@ export default function NewProductPage() {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("Tops");
+  const [category, setCategory] = useState("");
+  const [catOptions, setCatOptions] = useState<{ value: string; label: string }[]>([]);
+  const [catLoading, setCatLoading] = useState(true);
+  const [catError, setCatError] = useState<string | null>(null);
   const [mrp, setMrp] = useState<number | "">("");
   const [price, setPrice] = useState<number | "">("");
   const [discountPercent, setDiscountPercent] = useState<number | "">("");
@@ -32,6 +36,26 @@ export default function NewProductPage() {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
+
+  // Load categories from backend (admin-protected)
+  useEffect(() => {
+    async function loadCats() {
+      setCatLoading(true);
+      setCatError(null);
+      try {
+        const res = await fetchCategories({ page: 1, limit: 100 });
+        const opts = res.categories.map((c: ApiCategory) => ({ value: c.name, label: c.name }));
+        setCatOptions(opts);
+        if (!category) setCategory(opts[0]?.value || "");
+      } catch (e: any) {
+        setCatError(e?.message || "Failed to load categories");
+      } finally {
+        setCatLoading(false);
+      }
+    }
+    loadCats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function toggleSize(size: string) {
     setSizes((prev) => (prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]));
@@ -167,19 +191,12 @@ export default function NewProductPage() {
             <div className="grid md:grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>Category</Label>
+                {catError && <div className="text-xs text-red-600">{catError}</div>}
                 <SelectSearch
-                  options={[
-                    { value: "Tops", label: "Tops" },
-                    { value: "Bottoms", label: "Bottoms" },
-                    { value: "Dresses", label: "Dresses" },
-                    { value: "Outerwear", label: "Outerwear" },
-                    { value: "Knitwear", label: "Knitwear" },
-                    { value: "Shoes", label: "Shoes" },
-                    { value: "Accessories", label: "Accessories" },
-                  ]}
+                  options={catOptions}
                   value={category}
-                  onChange={(v) => setCategory(v || "Tops")}
-                  placeholder="Select options"
+                  onChange={(v) => setCategory(v || "")}
+                  placeholder={catLoading ? "Loading categories..." : (catOptions.length ? "Select category" : "No categories found")}
                   searchPlaceholder="Search category..."
                 />
               </div>
