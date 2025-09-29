@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useCartStore } from "@/store/cart";
 import { useUIStore } from "@/store/ui";
 import Image from "next/image";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function MiniCart() {
   const [mounted, setMounted] = useState(false);
@@ -13,6 +14,15 @@ export default function MiniCart() {
   const remove = useCartStore((s) => s.removeItem);
   const removeAll = useCartStore((s) => s.removeAll);
   const setQty = useCartStore((s) => s.setQty);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Auto-close the drawer on route change so overlay never stays on top
+  useEffect(() => {
+    if (!mounted) return;
+    if (miniCartOpen) closeMiniCart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   const subtotal = items.reduce((sum, i) => sum + (i.snapshot.salePrice ?? i.snapshot.price) * i.qty, 0);
 
@@ -88,7 +98,17 @@ export default function MiniCart() {
             <span className="text-sm text-muted-foreground">Subtotal</span>
             <span className="font-medium">₹{subtotal.toLocaleString("en-IN")}</span>
           </div>
-          <a href="/cart" className="w-full inline-flex items-center justify-center rounded-md px-4 py-2 bg-foreground text-background text-sm">View Cart</a>
+          <button
+            type="button"
+            onClick={() => {
+              // Close first to avoid overlay persisting on mobile, then navigate SPA
+              try { closeMiniCart(); } catch {}
+              router.push('/cart');
+            }}
+            className="w-full inline-flex items-center justify-center rounded-md px-4 py-2 bg-foreground text-background text-sm"
+          >
+            View Cart
+          </button>
         </div>
       </aside>
     </div>

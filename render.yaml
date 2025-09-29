@@ -16,6 +16,9 @@ services:
         value: production
       - key: PORT
         value: 10000
+      - key: FRONTEND_URL
+        # Set this in Render dashboard to your live storefront URL, e.g. https://niraya1303.vercel.app
+        sync: false
       # Replace the values below with your real secrets in the Render dashboard after first deploy
       - key: MONGO_URI
         sync: false
