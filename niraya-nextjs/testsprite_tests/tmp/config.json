@@ -1,0 +1,15 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3000",
+  "executionArgs": {
+    "projectName": "niraya-nextjs",
+    "projectPath": "c:\\Users\\Jainam\\Desktop\\startup\\niraya-nextjs",
+    "testIds": [],
+    "additionalInstruction": "Create Playwright tests to run against http://localhost:3000. Scenarios: (A) Quick View add-to-cart with size/color: find a product with sizes on home or collections, open quick view, select a size, add to cart, assert mini cart shows 'Size:' and then navigate to /cart and assert size is displayed. (B) Logout preserves cart: after adding, open header profile menu, click Logout, reload /cart, assert item still present. If no login is active, skip login and only assert persistence across refresh. (C) Mobile mini-cart flow: emulate iPhone 12 viewport, add item, open mini cart, click 'View Cart'; assert overlay closed and URL is /cart. Include robustness: if no product with sizes found, skip with informative message. Use data-testids where available or fallback to visible text. Save a markdown report.",
+    "envs": {
+      "API_KEY": "sk-user-1RMAaMlFmnHZ0hY0jdO-YVftiC7Ep6QOZ1-_QybuWOyQHNtcVfDIFLAw8ntXCzAKIDwuFken04s2v6xkGkOTZWZKWzhmlqmAzw4EmNwH41OqUd_fWMeH82NzgYo6h087L_0"
+    }
+  }
+}

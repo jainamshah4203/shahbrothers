@@ -1,9 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['images.unsplash.com', 'picsum.photos', 'localhost', '127.0.0.1', 'res.cloudinary.com'],
+    domains: ['images.unsplash.com', 'plus.unsplash.com', 'picsum.photos', 'localhost', '127.0.0.1', 'res.cloudinary.com'],
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'plus.unsplash.com' },
       { protocol: 'https', hostname: 'picsum.photos' },
       { protocol: 'https', hostname: 'res.cloudinary.com' },
       { protocol: 'http', hostname: 'localhost' },

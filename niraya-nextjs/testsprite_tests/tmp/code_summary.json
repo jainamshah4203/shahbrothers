@@ -1,0 +1,88 @@
+{
+  "tech_stack": [
+    "TypeScript",
+    "Next.js 13+ (App Router)",
+    "React",
+    "Zustand (state, persist)",
+    "@tanstack/react-query",
+    "Tailwind CSS / ShadCN UI",
+    "Razorpay (payments)",
+    "Express backend API"
+  ],
+  "features": [
+    {
+      "name": "Auth Store & Forms",
+      "description": "Client auth persisted in localStorage with token/user. Login form posts to /auth/login and stores auth in zustand.",
+      "files": [
+        "store/auth.ts",
+        "components/auth/LoginForm.tsx",
+        "components/auth/RegisterForm.tsx",
+        "components/auth/Protected.tsx",
+        "components/layout/Header.tsx"
+      ]
+    },
+    {
+      "name": "Cart Store & MiniCart",
+      "description": "Cart with size/color on line items, persisted in localStorage. MiniCart drawer UI with mobile-friendly navigation to /cart.",
+      "files": [
+        "store/cart.ts",
+        "components/cart/MiniCart.tsx",
+        "components/checkout/CheckoutPage.tsx"
+      ]
+    },
+    {
+      "name": "Quick View Add-to-Cart",
+      "description": "Quick View modals in home sections allow choosing size/color and add to cart with options.",
+      "files": [
+        "components/home/NewArrivals.tsx",
+        "components/home/BestSellersStrip.tsx",
+        "components/home/OnSaleStrip.tsx",
+        "components/home/HomepageSections.tsx",
+        "components/product/ProductCard.tsx",
+        "components/product/BuyBox.tsx"
+      ]
+    },
+    {
+      "name": "Product Fetch & Mapping",
+      "description": "API helpers and product mapping from backend API shape to storefront Product type.",
+      "files": [
+        "lib/api.ts",
+        "lib/products.ts",
+        "types/product.ts"
+      ]
+    },
+    {
+      "name": "Coupons",
+      "description": "Validate coupons and apply discount client-side based on backend response.",
+      "files": [
+        "lib/coupons.ts",
+        "store/cart.ts",
+        "components/checkout/CheckoutPage.tsx"
+      ]
+    },
+    {
+      "name": "Payments (Razorpay)",
+      "description": "Create Razorpay order, open checkout, verify signature, and place order.",
+      "files": [
+        "lib/payments.ts",
+        "components/checkout/CheckoutPage.tsx"
+      ]
+    },
+    {
+      "name": "Collections Page",
+      "description": "Client filtering (category, color, size, price, search) with Quick View and load-more.",
+      "files": [
+        "components/collections/CollectionsClient.tsx"
+      ]
+    },
+    {
+      "name": "UI & Layout",
+      "description": "Header with auth/logout, wishlist, cart badge; shared UI components.",
+      "files": [
+        "components/layout/Header.tsx",
+        "components/ui/*",
+        "components/home/HomepageSections.tsx"
+      ]
+    }
+  ]
+}
