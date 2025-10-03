@@ -6,8 +6,8 @@ export default function Page() {
     <div className="min-h-screen">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-semibold">About NIRAYA</h1>
-        <p className="text-muted-foreground mt-2">Premium Indian fashion brand with a focus on quality and design.</p>
+        <h1 className="text-2xl font-semibold">About ecom-store</h1>
+        <p className="text-muted-foreground mt-2">Premium fashion brand with a focus on quality and design.</p>
       </main>
       <Footer />
     </div>

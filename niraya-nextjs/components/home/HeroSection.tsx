@@ -9,7 +9,7 @@ const HeroSection = () => {
       <div className="absolute inset-0">
         <Image
           src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=2000&q=80"
-          alt="NIRAYA Fashion Collection"
+          alt="ecom-store Fashion Collection"
           fill
           sizes="100vw"
           priority

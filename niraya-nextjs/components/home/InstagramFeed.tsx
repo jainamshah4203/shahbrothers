@@ -58,11 +58,11 @@ const InstagramFeed = () => {
           <div className="flex items-center justify-center mb-4">
             <Instagram className="h-8 w-8 mr-3" />
             <h2 className="text-4xl md:text-5xl font-serif">
-              @niraya.style
+              @ecom.store
             </h2>
           </div>
           <p className="text-lg text-muted-foreground">
-            Follow our journey and get styled with NIRAYA
+            Follow our journey and get styled with ecom-store
           </p>
         </div>
 
@@ -103,7 +103,7 @@ const InstagramFeed = () => {
         <div className="text-center">
           <Button size="lg" className="group">
             <Instagram className="mr-2 h-5 w-5" />
-            Follow @niraya.style
+            Follow @ecom.store
             <ExternalLink className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Button>
         </div>

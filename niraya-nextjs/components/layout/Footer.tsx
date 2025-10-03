@@ -12,7 +12,7 @@ const Footer = () => {
           {/* Brand & Newsletter */}
           <div className="lg:col-span-2">
             <Link href="/" className="text-3xl font-serif font-semibold mb-4 block">
-              NIRAYA
+              ecom-store
             </Link>
             <p className="text-muted-foreground mb-6 max-w-md">
               Timeless pieces for the modern woman. Discover our curated collection
@@ -93,7 +93,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <div className="flex items-center space-x-6">
             <p className="text-sm text-muted-foreground">
-              © 2024 NIRAYA. All rights reserved.
+              © 2024 ecom-store. All rights reserved.
             </p>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="icon" className="h-8 w-8">
