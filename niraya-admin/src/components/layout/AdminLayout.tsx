@@ -41,6 +41,7 @@ function SidebarLink({ href, label, icon: Icon, active }: any) {
 }
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
+  const brand = (process.env.NEXT_PUBLIC_COMPANY_NAME as string) || 'ecom-store';
   const pathname = usePathname();
   const router = useRouter();
   const [openProducts, setOpenProducts] = React.useState<boolean>(pathname?.startsWith("/products") ?? false);
@@ -55,7 +56,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-background text-foreground flex">
       {/* Sidebar */}
       <aside className="hidden md:flex w-64 flex-col border-r bg-white">
-        <div className="h-14 border-b px-4 flex items-center font-semibold">Niraya Admin</div>
+        <div className="h-14 border-b px-4 flex items-center font-semibold">{brand} Admin</div>
         <nav className="flex-1 p-2 space-y-1">
           {/* Dashboard */}
           <SidebarLink href="/dashboard" label="Dashboard" icon={LayoutDashboard} active={pathname === "/dashboard"} />
@@ -112,7 +113,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Topbar (mobile) */}
         <header className="md:hidden border-b px-4 h-12 flex items-center justify-between">
-          <div className="font-semibold">Niraya Admin</div>
+          <div className="font-semibold">{brand} Admin</div>
           <Button size="sm" variant="outline" onClick={onLogout}>Logout</Button>
         </header>
         <main className="p-3 md:p-4">{children}</main>

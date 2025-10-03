@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Niraya Admin",
+  title: "ecom-store Admin",
   description: "Admin panel",
 };
 
