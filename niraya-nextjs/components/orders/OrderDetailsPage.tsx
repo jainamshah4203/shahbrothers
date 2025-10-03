@@ -126,7 +126,7 @@ export default function OrderDetailsPage() {
   // Removed print functionality in favor of server-generated PDF
 
   const company = {
-    name: process.env.NEXT_PUBLIC_COMPANY_NAME || "NIRAYA",
+    name: process.env.NEXT_PUBLIC_COMPANY_NAME || "ecom-store",
     logo: process.env.NEXT_PUBLIC_COMPANY_LOGO || "/favicon.ico",
     seal: process.env.NEXT_PUBLIC_COMPANY_SEAL || "",
     address:
@@ -134,7 +134,7 @@ export default function OrderDetailsPage() {
       "Ahmedabad, Gujarat, India",
     gst: process.env.NEXT_PUBLIC_COMPANY_GST || "",
     vat: process.env.NEXT_PUBLIC_COMPANY_VAT || "",
-    email: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@niraya.example",
+    email: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@ecom-store.example",
   };
 
   return (
