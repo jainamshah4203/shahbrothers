@@ -1,10 +1,10 @@
 services:
   - type: web
-    name: niraya-backend
+    name: backend
     env: node
     plan: free
     region: oregon
-    rootDir: niraya-backend
+    rootDir: backend
     buildCommand: |
       npm ci --legacy-peer-deps || npm install
       npm run build
