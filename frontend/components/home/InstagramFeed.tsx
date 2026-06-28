@@ -62,7 +62,7 @@ const InstagramFeed = () => {
             </h2>
           </div>
           <p className="text-lg text-muted-foreground">
-            Follow our journey and get styled with ecom-store
+            Follow our journey and get styled with Shah Brothers
           </p>
         </div>
 

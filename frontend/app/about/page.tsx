@@ -6,7 +6,7 @@ export default function Page() {
     <div className="min-h-screen">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-semibold">About ecom-store</h1>
+        <h1 className="text-2xl font-semibold">About Shah Brothers</h1>
         <p className="text-muted-foreground mt-2">Premium fashion brand with a focus on quality and design.</p>
       </main>
       <Footer />

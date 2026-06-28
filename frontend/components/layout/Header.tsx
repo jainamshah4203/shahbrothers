@@ -68,8 +68,9 @@ const Header = ({ cartItemsCount = 0 }: HeaderProps) => {
               </SheetTrigger>
               <SheetContent side="left" className="w-72">
                 <div className="flex flex-col space-y-6 mt-8">
-                  <Link href="/" className="text-2xl font-serif font-semibold">
-                    ecom-store
+                  <Link href="/" className="flex items-center text-2xl font-serif font-semibold">
+                    <img src="/logo.png" alt="SB Logo" className="h-8 w-8 mr-2 rounded-md object-cover" />
+                    Shah Brothers
                   </Link>
                   <nav className="flex flex-col space-y-4">
                     {navigationItems.map((item) => (
@@ -92,8 +93,9 @@ const Header = ({ cartItemsCount = 0 }: HeaderProps) => {
           </div>
 
           {/* Logo */}
-          <Link href="/" className="text-2xl lg:text-3xl font-serif font-semibold">
-            ecom-store
+          <Link href="/" className="flex items-center text-2xl lg:text-3xl font-serif font-semibold">
+            <img src="/logo.png" alt="SB Logo" className="h-10 w-10 mr-3 rounded-md object-cover" />
+            Shah Brothers
           </Link>
 
           {/* Desktop Navigation */}

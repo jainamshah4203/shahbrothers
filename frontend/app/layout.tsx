@@ -20,12 +20,12 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "ecom-store - Premium Fashion Collection",
-  description: "Discover sophisticated fashion with ecom-store's curated collection of premium clothing and accessories.",
+  title: "Shah Brothers - Premium Fashion Collection",
+  description: "Discover sophisticated fashion with Shah Brothers' curated collection of premium clothing and accessories.",
   keywords: ["fashion", "premium", "clothing", "accessories", "style", "elegance"],
-  authors: [{ name: "ecom-store" }],
-  creator: "ecom-store",
-  publisher: "ecom-store",
+  authors: [{ name: "Shah Brothers" }],
+  creator: "Shah Brothers",
+  publisher: "Shah Brothers",
   formatDetection: {
     email: false,
     address: false,
@@ -34,16 +34,16 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://ecom-store.example",
-    title: "ecom-store - Premium Fashion Collection",
-    description: "Discover sophisticated fashion with ecom-store's curated collection of premium clothing and accessories.",
-    siteName: "ecom-store",
+    url: "https://shahbrothers.example",
+    title: "Shah Brothers - Premium Fashion Collection",
+    description: "Discover sophisticated fashion with Shah Brothers' curated collection of premium clothing and accessories.",
+    siteName: "Shah Brothers",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ecom-store - Premium Fashion Collection",
-    description: "Discover sophisticated fashion with ecom-store's curated collection of premium clothing and accessories.",
-    creator: "@ecom_store",
+    title: "Shah Brothers - Premium Fashion Collection",
+    description: "Discover sophisticated fashion with Shah Brothers' curated collection of premium clothing and accessories.",
+    creator: "@shah_brothers",
   },
   robots: {
     index: true,
