@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Search, ShoppingBag, Menu, X, Heart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -69,7 +70,7 @@ const Header = ({ cartItemsCount = 0 }: HeaderProps) => {
               <SheetContent side="left" className="w-72">
                 <div className="flex flex-col space-y-6 mt-8">
                   <Link href="/" className="flex items-center text-2xl font-serif font-semibold">
-                    <img src="/logo.png" alt="SB Logo" className="h-8 w-8 mr-2 rounded-md object-cover" />
+                    <Image src="/logo.png" alt="SB Logo" width={32} height={32} className="h-8 w-8 mr-2 rounded-md object-cover" />
                     Shah Brothers
                   </Link>
                   <nav className="flex flex-col space-y-4">
@@ -94,7 +95,7 @@ const Header = ({ cartItemsCount = 0 }: HeaderProps) => {
 
           {/* Logo */}
           <Link href="/" className="flex items-center text-2xl lg:text-3xl font-serif font-semibold">
-            <img src="/logo.png" alt="SB Logo" className="h-10 w-10 mr-3 rounded-md object-cover" />
+            <Image src="/logo.png" alt="SB Logo" width={40} height={40} className="h-10 w-10 mr-3 rounded-md object-cover" />
             Shah Brothers
           </Link>
 

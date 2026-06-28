@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Instagram, Facebook, Twitter, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +13,7 @@ const Footer = () => {
           {/* Brand & Newsletter */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center text-3xl font-serif font-semibold mb-4">
-              <img src="/logo.png" alt="SB Logo" className="h-10 w-10 mr-3 rounded-md object-cover" />
+              <Image src="/logo.png" alt="SB Logo" width={40} height={40} className="h-10 w-10 mr-3 rounded-md object-cover" />
               Shah Brothers
             </Link>
             <p className="text-muted-foreground mb-6 max-w-md">
