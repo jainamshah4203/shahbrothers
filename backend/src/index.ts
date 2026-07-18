@@ -25,7 +25,7 @@ const PORT = process.env.PORT || 5000;
 
 // Connect DB
 connectDB().catch((e) => {
-  console.error('❌ Mongo connection failed:', e);
+  console.error('❌ Database connection failed:', e);
   process.exit(1);
 });
 

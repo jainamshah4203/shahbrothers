@@ -1,13 +1,13 @@
-import mongoose from 'mongoose';
+import { PrismaClient } from '@prisma/client';
+
+export const prisma = new PrismaClient();
 
 export async function connectDB() {
-  const uri = process.env.MONGO_URI;
-  if (!uri) {
-    throw new Error('MONGO_URI is not set');
+  try {
+    await prisma.$connect();
+    console.log('✅ Connected to Postgres (Neon) via Prisma');
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    process.exit(1);
   }
-  mongoose.set('strictQuery', true);
-  await mongoose.connect(uri, {
-    // options placeholder; mongoose 8 uses global
-  });
-  console.log('✅ Connected to MongoDB');
 }

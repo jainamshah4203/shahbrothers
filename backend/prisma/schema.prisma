@@ -1,0 +1,171 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  passwordHash String
+  role         String        @default("user") // 'user' | 'admin'
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  
+  orders       Order[]
+  couponUsages CouponUsage[]
+  reviews      Review[]
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Product {
+  id               String    @id @default(uuid())
+  name             String
+  slug             String    @unique
+  description      String
+  price            Float
+  salePrice        Float?
+  images           Json      // Array of objects {url, alt}
+  heroIndex        Int       @default(0)
+  category         String
+  sizes            String[]
+  colors           Json      // Array of objects {name, hex}
+  stock            Int
+  brand            String?
+  featured         Boolean   @default(false)
+  isNewProduct     Boolean   @default(false)
+  isBestseller     Boolean   @default(false)
+  limited          Boolean   @default(false)
+  material         String
+  careInstructions String[]  @default([])
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  variants         Variant[]
+  reviews          Review[]
+  orderItems       OrderItem[]
+}
+
+model Variant {
+  id              String   @id @default(uuid())
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku             String?
+  color           String?
+  size            String?
+  mrp             Float
+  price           Float
+  discountPercent Float?
+  stock           Int      @default(0)
+  images          String[] @default([])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Order {
+  id              String        @id @default(uuid())
+  userId          String?
+  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email           String?
+  invoiceNumber   Int           @default(autoincrement()) @unique
+  notes           String?
+  subtotal        Float?
+  discount        Float         @default(0)
+  couponDiscount  Float         @default(0)
+  shippingFee     Float         @default(0)
+  total           Float
+  totalAmount     Float?
+  transactionId   String?
+  status          String        @default("Processing") // 'Processing' | 'Paid' | 'Shipped' | 'Delivered' | 'Cancelled' | 'Failed'
+  paymentMethod   String        @default("COD") // 'COD' | 'Prepaid' | 'Razorpay' | 'Stripe' | 'Other'
+  shippingAddress Json          // Complex address object
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  items           OrderItem[]
+  couponUsage     CouponUsage?
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  quantity  Int
+  size      String?
+  color     String?
+  snapshot  Json    // Product details snapshot
+}
+
+model Coupon {
+  id           String        @id @default(uuid())
+  code         String        @unique
+  type         String        // 'percent' | 'fixed'
+  value        Float
+  minOrder     Float?
+  maxDiscount  Float?
+  startDate    DateTime?
+  endDate      DateTime?
+  usageLimit   Int?
+  perUserLimit Int?
+  active       Boolean       @default(true)
+  usedCount    Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  usages       CouponUsage[]
+}
+
+model CouponUsage {
+  id             String   @id @default(uuid())
+  couponId       String
+  coupon         Coupon   @relation(fields: [couponId], references: [id], onDelete: Restrict)
+  couponCode     String
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email          String?
+  orderId        String   @unique
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  usedAt         DateTime @default(now())
+  orderTotal     Float
+  discountAmount Float
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name      String?
+  email     String?
+  rating    Int
+  title     String?
+  comment   String
+  status    String   @default("pending") // 'pending' | 'approved' | 'rejected'
+  reply     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSettings {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  homepage  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

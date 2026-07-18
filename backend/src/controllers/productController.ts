@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { Product } from '../models/Product';
+import { prisma } from '../config/database';
 import { validationResult } from 'express-validator';
 
 function mapApiProduct(p: any) {
   return {
-    _id: p._id,
+    id: p.id,
     name: p.name,
     description: p.description,
     price: p.price,
@@ -36,7 +36,6 @@ export const bulkUpdateProducts = async (req: Request, res: Response): Promise<v
       return;
     }
     const validIds = idList.filter((s) => typeof s === 'string');
-    const filter = { _id: { $in: validIds } } as any;
     const set: any = {};
     if (action === 'feature') set.featured = true;
     else if (action === 'unfeature') set.featured = false;
@@ -50,7 +49,10 @@ export const bulkUpdateProducts = async (req: Request, res: Response): Promise<v
       res.status(400).json({ message: 'Invalid action' });
       return;
     }
-    await Product.updateMany(filter, { $set: set });
+    await prisma.product.updateMany({
+      where: { id: { in: validIds } },
+      data: set
+    });
     res.json({ success: true });
   } catch (error) {
     console.error('Bulk update products error:', error);
@@ -67,7 +69,6 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
     }
 
     const body = req.body || {};
-    // Normalize images/colors to expected schema shape
     const images = Array.isArray(body.images)
       ? body.images.map((im: any) => (typeof im === 'string' ? { url: im } : im)).filter((im: any) => im && im.url)
       : [];
@@ -75,24 +76,26 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
       ? body.colors.map((c: any) => (typeof c === 'string' ? { name: c } : c)).filter((c: any) => c && c.name)
       : [];
 
-    const created = await Product.create({
-      name: body.name,
-      slug: body.slug,
-      description: body.description,
-      price: body.price,
-      salePrice: body.salePrice,
-      images,
-      category: body.category,
-      sizes: body.sizes || [],
-      colors,
-      stock: body.stock ?? 0,
-      brand: body.brand,
-      featured: !!body.featured,
-      limited: !!body.limited,
-      isNewProduct: !!body.isNewProduct,
-      isBestseller: !!body.isBestseller,
-      material: body.material,
-      careInstructions: body.careInstructions || [],
+    const created = await prisma.product.create({
+      data: {
+        name: body.name,
+        slug: body.slug,
+        description: body.description,
+        price: body.price,
+        salePrice: body.salePrice,
+        images: images,
+        category: body.category,
+        sizes: body.sizes || [],
+        colors: colors,
+        stock: body.stock ?? 0,
+        brand: body.brand,
+        featured: !!body.featured,
+        limited: !!body.limited,
+        isNewProduct: !!body.isNewProduct,
+        isBestseller: !!body.isBestseller,
+        material: body.material,
+        careInstructions: body.careInstructions || [],
+      }
     });
 
     res.status(201).json({ product: mapApiProduct(created) });
@@ -119,11 +122,10 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
       updates.colors = body.colors.map((c: any) => (typeof c === 'string' ? { name: c } : c)).filter((c: any) => c && c.name);
     }
 
-    const updated = await Product.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
-    if (!updated) {
-      res.status(404).json({ message: 'Product not found' });
-      return;
-    }
+    const updated = await prisma.product.update({
+      where: { id },
+      data: updates
+    });
     res.json({ product: mapApiProduct(updated) });
   } catch (error) {
     console.error('Update product error:', error);
@@ -134,11 +136,9 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
 export const deleteProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const deleted = await Product.findByIdAndDelete(id);
-    if (!deleted) {
-      res.status(404).json({ message: 'Product not found' });
-      return;
-    }
+    await prisma.product.delete({
+      where: { id }
+    });
     res.json({ success: true });
   } catch (error) {
     console.error('Delete product error:', error);
@@ -165,11 +165,17 @@ export const getAllProducts = async (req: Request, res: Response): Promise<void>
 
     if (category) filter.category = category;
     if (brand) filter.brand = brand;
-    if (search) filter.$text = { $search: search };
+    if (search) {
+      filter.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { brand: { contains: search, mode: 'insensitive' } },
+      ];
+    }
     if (minPrice || maxPrice) {
       filter.price = {};
-      if (minPrice) filter.price.$gte = Number(minPrice);
-      if (maxPrice) filter.price.$lte = Number(maxPrice);
+      if (minPrice) filter.price.gte = Number(minPrice);
+      if (maxPrice) filter.price.lte = Number(maxPrice);
     }
 
     // Booleans
@@ -179,19 +185,25 @@ export const getAllProducts = async (req: Request, res: Response): Promise<void>
     if (typeof bestSeller === 'string' && /^(true|1)$/i.test(bestSeller)) filter.isBestseller = true;
     const saleOnly = (req.query as any).saleOnly;
     if (typeof saleOnly === 'string' && /^(true|1)$/i.test(saleOnly)) {
-      filter.$expr = { $lt: ['$salePrice', '$price'] };
+      filter.salePrice = { not: null };
     }
     const limited = (req.query as any).limited;
     if (typeof limited === 'string' && /^(true|1)$/i.test(limited)) filter.limited = true;
     const newOnly = (req.query as any).newOnly;
     if (typeof newOnly === 'string' && /^(true|1)$/i.test(newOnly)) filter.isNewProduct = true;
 
-    const sort: any = {};
-    sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+    const orderBy: any = {};
+    orderBy[sortBy] = sortOrder === 'desc' ? 'desc' : 'asc';
 
-    const productsDocs = await Product.find(filter).sort(sort).skip(skip).limit(Number(limit));
+    const productsDocs = await prisma.product.findMany({
+      where: filter,
+      orderBy,
+      skip,
+      take: Number(limit)
+    });
+    
     const products = productsDocs.map(mapApiProduct);
-    const total = await Product.countDocuments(filter);
+    const total = await prisma.product.count({ where: filter });
     const totalPages = Math.ceil(total / Number(limit));
 
     res.json({
@@ -213,11 +225,13 @@ export const getAllProducts = async (req: Request, res: Response): Promise<void>
 export const getFeaturedProducts = async (req: Request, res: Response): Promise<void> => {
   try {
     const { limit = '8' } = req.query as Record<string, string>;
-    const productsDocs = await Product.find({
-      $or: [{ isNewProduct: true }, { isBestseller: true }],
-    })
-      .sort({ createdAt: -1 })
-      .limit(Number(limit));
+    const productsDocs = await prisma.product.findMany({
+      where: {
+        OR: [{ isNewProduct: true }, { isBestseller: true }],
+      },
+      orderBy: { createdAt: 'desc' },
+      take: Number(limit)
+    });
 
     res.json({ products: productsDocs.map(mapApiProduct) });
   } catch (error) {
@@ -232,12 +246,14 @@ export const getProductsByCategory = async (req: Request, res: Response): Promis
     const { page = '1', limit = '12' } = req.query as Record<string, string>;
     const skip = (Number(page) - 1) * Number(limit);
 
-    const productsDocs = await Product.find({ category })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(Number(limit));
+    const productsDocs = await prisma.product.findMany({
+      where: { category },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: Number(limit)
+    });
 
-    const total = await Product.countDocuments({ category });
+    const total = await prisma.product.count({ where: { category } });
     const totalPages = Math.ceil(total / Number(limit));
 
     res.json({
@@ -259,9 +275,12 @@ export const getProductsByCategory = async (req: Request, res: Response): Promis
 export const getProductBySlug = async (req: Request, res: Response): Promise<void> => {
   try {
     const { slug } = req.params;
-    // Case-insensitive exact match to be robust against casing differences
-    const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const product = await Product.findOne({ slug: { $regex: new RegExp(`^${escapeRegExp(slug)}$`, 'i') } });
+    const product = await prisma.product.findFirst({
+      where: {
+        slug: { equals: slug, mode: 'insensitive' }
+      }
+    });
+    
     if (!product) {
       res.status(404).json({ message: 'Product not found' });
       return;
@@ -276,7 +295,7 @@ export const getProductBySlug = async (req: Request, res: Response): Promise<voi
 export const getProductById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const product = await Product.findById(id);
+    const product = await prisma.product.findUnique({ where: { id } });
     if (!product) {
       res.status(404).json({ message: 'Product not found' });
       return;

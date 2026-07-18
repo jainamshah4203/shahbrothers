@@ -1,0 +1,384 @@
+﻿import mongoose, { Schema, Document } from 'mongoose';
+
+export interface ICategory extends Document {
+  name: string;
+  slug: string;
+  description?: string;
+}
+
+const CategorySchema = new Schema<ICategory>(
+  {
+    name: { type: String, required: true, trim: true },
+    slug: { type: String, required: true, unique: true, index: true },
+    description: { type: String },
+  },
+  { timestamps: true }
+);
+
+export const Category = mongoose.models.Category || mongoose.model<ICategory>('Category', CategorySchema);
+import mongoose, { Schema, Document } from 'mongoose';
+
+export interface ICounter extends Document {
+  key: string;
+  seq: number;
+}
+
+const CounterSchema = new Schema<ICounter>({
+  key: { type: String, required: true, unique: true, index: true },
+  seq: { type: Number, default: 0 },
+});
+
+export const Counter = mongoose.models.Counter || mongoose.model<ICounter>('Counter', CounterSchema);
+
+export async function nextSequence(key: string): Promise<number> {
+  const updated = await Counter.findOneAndUpdate(
+    { key },
+    { $inc: { seq: 1 } },
+    { upsert: true, new: true }
+  );
+  return updated!.seq;
+}
+import mongoose, { Schema, Document } from 'mongoose';
+
+export interface ICoupon extends Document {
+  code: string;
+  type: 'percent' | 'fixed';
+  value: number; // percent 0-100 or fixed amount
+  minOrder?: number;
+  maxDiscount?: number; // cap when percent
+  startDate?: Date;
+  endDate?: Date;
+  usageLimit?: number; // total usage allowed
+  perUserLimit?: number; // usage per user/email
+  active: boolean;
+  usedCount: number;
+}
+
+const CouponSchema = new Schema<ICoupon>({
+  code: { type: String, required: true, unique: true, uppercase: true, trim: true, index: true },
+  type: { type: String, enum: ['percent', 'fixed'], required: true },
+  value: { type: Number, required: true, min: 0 },
+  minOrder: { type: Number, min: 0 },
+  maxDiscount: { type: Number, min: 0 },
+  startDate: { type: Date },
+  endDate: { type: Date },
+  usageLimit: { type: Number, min: 0 },
+  perUserLimit: { type: Number, min: 0 },
+  active: { type: Boolean, default: true },
+  usedCount: { type: Number, default: 0, min: 0 },
+}, { timestamps: true });
+
+export const Coupon = mongoose.models.Coupon || mongoose.model<ICoupon>('Coupon', CouponSchema);
+import mongoose, { Schema, Document, Types } from 'mongoose';
+
+export interface ICouponUsage extends Document {
+  couponId: Types.ObjectId;
+  couponCode: string; // denormalized for easier queries
+  userId?: Types.ObjectId;
+  email?: string; // for guest users
+  orderId: Types.ObjectId;
+  usedAt: Date;
+  orderTotal: number;
+  discountAmount: number;
+}
+
+const CouponUsageSchema = new Schema<ICouponUsage>({
+  couponId: { type: Schema.Types.ObjectId, ref: 'Coupon', required: true, index: true },
+  couponCode: { type: String, required: true, index: true },
+  userId: { type: Schema.Types.ObjectId, ref: 'User', index: true },
+  email: { type: String, index: true },
+  orderId: { type: Schema.Types.ObjectId, ref: 'Order', required: true, unique: true },
+  usedAt: { type: Date, default: Date.now, index: true },
+  orderTotal: { type: Number, required: true, min: 0 },
+  discountAmount: { type: Number, required: true, min: 0 },
+}, { timestamps: true });
+
+// Compound indexes for efficient queries
+CouponUsageSchema.index({ couponId: 1, userId: 1 });
+CouponUsageSchema.index({ couponId: 1, email: 1 });
+CouponUsageSchema.index({ couponCode: 1, usedAt: -1 });
+
+export const CouponUsage = mongoose.models.CouponUsage || mongoose.model<ICouponUsage>('CouponUsage', CouponUsageSchema);
+import mongoose, { Schema, Document, Types } from 'mongoose';
+
+export interface IOrderItem {
+  product: Types.ObjectId;
+  quantity: number;
+  size?: string;
+  color?: string;
+  snapshot: {
+    name: string;
+    price: number;
+    salePrice?: number;
+    image?: string;
+    sku?: string;
+  };
+}
+
+export interface IAddress {
+  name?: string;
+  phone?: string;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+}
+
+export interface IOrder extends Document {
+  userId?: Types.ObjectId;
+  email?: string;
+  invoiceNumber?: string;
+  notes?: string;
+  items: IOrderItem[];
+  subtotal?: number;
+  discount?: number;
+  couponDiscount?: number;
+  shippingFee?: number;
+  total: number;
+  totalAmount?: number;
+  transactionId?: string;
+  status: 'Processing' | 'Paid' | 'Shipped' | 'Delivered' | 'Cancelled' | 'Failed';
+  paymentMethod?: 'COD' | 'Prepaid' | 'Razorpay' | 'Stripe' | 'Other';
+  shippingAddress: IAddress;
+}
+
+const OrderItemSchema = new Schema<IOrderItem>({
+  product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
+  quantity: { type: Number, required: true, min: 1 },
+  size: { type: String },
+  color: { type: String },
+  snapshot: {
+    name: { type: String, required: true },
+    price: { type: Number, required: true },
+    salePrice: { type: Number },
+    image: { type: String },
+    sku: { type: String },
+  },
+});
+
+const AddressSchema = new Schema<IAddress>({
+  name: { type: String },
+  phone: { type: String },
+  street: { type: String, required: true },
+  city: { type: String, required: true },
+  state: { type: String, required: true },
+  zipCode: { type: String, required: true },
+  country: { type: String, required: true },
+});
+
+const OrderSchema = new Schema<IOrder>(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
+    email: { type: String },
+    invoiceNumber: { type: String, unique: true, sparse: true, index: true },
+    notes: { type: String },
+    items: { type: [OrderItemSchema], required: true, validate: [(arr: any[]) => arr.length > 0, 'At least one item'] },
+    subtotal: { type: Number, min: 0 },
+    discount: { type: Number, min: 0, default: 0 },
+    couponDiscount: { type: Number, min: 0, default: 0 },
+    shippingFee: { type: Number, min: 0, default: 0 },
+    total: { type: Number, required: true, min: 0 },
+    totalAmount: { type: Number, min: 0 },
+    transactionId: { type: String },
+    status: { type: String, enum: ['Processing', 'Paid', 'Shipped', 'Delivered', 'Cancelled', 'Failed'], default: 'Processing' },
+    paymentMethod: { type: String, enum: ['COD', 'Prepaid', 'Razorpay', 'Stripe', 'Other'], default: 'COD' },
+    shippingAddress: { type: AddressSchema, required: true },
+  },
+  { timestamps: true }
+);
+
+export const Order = mongoose.models.Order || mongoose.model<IOrder>('Order', OrderSchema);
+import mongoose, { Schema, Document } from 'mongoose';
+
+export interface IProduct extends Document {
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  salePrice?: number;
+  images: { url: string; alt?: string }[];
+  category: 'Tops' | 'Bottoms' | 'Dresses' | 'Outerwear' | 'Knitwear' | 'Shoes' | 'Accessories';
+  sizes: string[];
+  colors: { name: string; hex?: string }[];
+  stock: number;
+  brand?: string;
+  featured?: boolean;
+  isNewProduct?: boolean;
+  isBestseller?: boolean;
+  limited?: boolean;
+  material: string;
+  careInstructions?: string[];
+  heroIndex?: number;
+  mainImageUrl?: string; // virtual
+}
+
+const ProductSchema = new Schema<IProduct>(
+  {
+    name: { type: String, required: true, trim: true },
+    slug: { type: String, required: true, unique: true, index: true },
+    description: { type: String, required: true },
+    price: { type: Number, required: true, min: 0 },
+    salePrice: { type: Number, min: 0 },
+    images: {
+      type: [
+        {
+          url: { type: String, required: true },
+          alt: { type: String },
+        },
+      ],
+      default: [],
+      validate: [(arr: any[]) => arr.length > 0, 'At least one image is required'],
+    },
+    heroIndex: { type: Number, min: 0, default: 0 },
+    category: {
+      type: String,
+      enum: ['Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Knitwear', 'Shoes', 'Accessories'],
+      required: true,
+      index: true,
+    },
+    sizes: { type: [String], required: true },
+    colors: {
+      type: [
+        {
+          name: { type: String, required: true },
+          hex: { type: String },
+        },
+      ],
+      required: true,
+    },
+    stock: { type: Number, required: true, min: 0 },
+    brand: { type: String },
+    featured: { type: Boolean, default: false },
+    isNewProduct: { type: Boolean, default: false },
+    isBestseller: { type: Boolean, default: false },
+    limited: { type: Boolean, default: false },
+    material: { type: String, required: true },
+    careInstructions: { type: [String], default: [] },
+  },
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+);
+
+ProductSchema.index({ name: 'text', description: 'text', brand: 'text' });
+
+// Virtual: mainImageUrl points to hero image url or first if not available
+ProductSchema.virtual('mainImageUrl').get(function (this: IProduct) {
+  try {
+    const idx = Math.max(0, Math.min((this as any).heroIndex ?? 0, (this.images?.length || 1) - 1));
+    const entry: any = this.images?.[idx];
+    return entry?.url || entry || '';
+  } catch {
+    return '';
+  }
+});
+
+export const Product = mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);
+import mongoose, { Schema, Document, Types } from 'mongoose';
+
+export interface IReview extends Document {
+  productId: Types.ObjectId;
+  userId?: Types.ObjectId;
+  name?: string;
+  email?: string;
+  rating: number; // 1-5
+  title?: string;
+  comment: string;
+  status: 'pending' | 'approved' | 'rejected';
+  reply?: string;
+}
+
+const ReviewSchema = new Schema<IReview>({
+  productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true, index: true },
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
+  name: { type: String },
+  email: { type: String },
+  rating: { type: Number, required: true, min: 1, max: 5 },
+  title: { type: String },
+  comment: { type: String, required: true },
+  status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending', index: true },
+  reply: { type: String },
+}, { timestamps: true });
+
+ReviewSchema.index({ productId: 1, createdAt: -1 });
+ReviewSchema.index({ email: 1, createdAt: -1 });
+
+export const Review = mongoose.models.Review || mongoose.model<IReview>('Review', ReviewSchema);
+import mongoose, { Schema, Document, Types } from 'mongoose';
+
+export interface IHomepageSettings {
+  banners: string[]; // hero/banner images (URLs)
+  featuredProducts: Types.ObjectId[]; // product IDs
+  saleProducts: Types.ObjectId[]; // product IDs with sale label
+  bestSellerProducts: Types.ObjectId[]; // product IDs with best seller label
+}
+
+export interface ISiteSettings extends Document {
+  key: string; // singleton key e.g., "homepage"
+  homepage: IHomepageSettings;
+}
+
+const HomepageSchema = new Schema<IHomepageSettings>({
+  banners: { type: [String], default: [] },
+  featuredProducts: { type: [Schema.Types.ObjectId], ref: 'Product', default: [] },
+  saleProducts: { type: [Schema.Types.ObjectId], ref: 'Product', default: [] },
+  bestSellerProducts: { type: [Schema.Types.ObjectId], ref: 'Product', default: [] },
+});
+
+const SiteSettingsSchema = new Schema<ISiteSettings>({
+  key: { type: String, required: true, unique: true, index: true },
+  homepage: { type: HomepageSchema, default: {} },
+}, { timestamps: true });
+
+export const SiteSettings = mongoose.models.SiteSettings || mongoose.model<ISiteSettings>('SiteSettings', SiteSettingsSchema);
+import mongoose, { Schema, Document } from 'mongoose';
+
+export interface IUser extends Document {
+  name: string;
+  email: string;
+  passwordHash: string;
+  role: 'user' | 'admin';
+}
+
+const UserSchema = new Schema<IUser>(
+  {
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true, lowercase: true, index: true },
+    passwordHash: { type: String, required: true },
+    role: { type: String, enum: ['user', 'admin'], default: 'user', index: true },
+  },
+  { timestamps: true }
+);
+
+export const User = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+import mongoose, { Schema, Document, Types } from 'mongoose';
+
+export interface IVariant extends Document {
+  productId: Types.ObjectId;
+  sku?: string;
+  color?: string;
+  size?: string;
+  mrp: number; // original price
+  price: number; // selling price
+  discountPercent?: number; // convenience cache
+  stock: number;
+  images: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const VariantSchema = new Schema<IVariant>(
+  {
+    productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true, index: true },
+    sku: { type: String, trim: true },
+    color: { type: String, trim: true },
+    size: { type: String, trim: true },
+    mrp: { type: Number, required: true, min: 0 },
+    price: { type: Number, required: true, min: 0 },
+    discountPercent: { type: Number, min: 0, max: 100 },
+    stock: { type: Number, default: 0, min: 0 },
+    images: { type: [String], default: [] },
+  },
+  { timestamps: true }
+);
+
+export const Variant = mongoose.models.Variant || mongoose.model<IVariant>('Variant', VariantSchema);

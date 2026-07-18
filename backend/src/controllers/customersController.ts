@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import { Order } from '../models/Order';
-import { User } from '../models/User';
+import { prisma } from '../config/database';
 
 // GET /customers?search=&page=&limit=
 export async function listCustomers(req: Request, res: Response) {
@@ -10,58 +9,71 @@ export async function listCustomers(req: Request, res: Response) {
     const skip = (page - 1) * limit;
     const search = String(req.query.search || '').trim();
 
-    // Aggregate customers by email from Orders (includes guests)
-    const match: any = {};
+    // Since Prisma doesn't support MongoDB-style aggregation pipelines,
+    // we aggregate customers by email from Orders using raw queries via groupBy + in-memory enrichment
+
+    // Get all orders (with email filter if searching)
+    const orderFilter: any = {};
     if (search) {
-      match.$or = [
-        { email: { $regex: search, $options: 'i' } },
-        { 'shippingAddress.name': { $regex: search, $options: 'i' } },
+      orderFilter.OR = [
+        { email: { contains: search, mode: 'insensitive' } },
       ];
     }
 
-    const pipeline: any[] = [
-      { $match: match },
-      {
-        $group: {
-          _id: '$email',
-          email: { $first: '$email' },
-          name: { $first: '$shippingAddress.name' },
-          phone: { $first: '$shippingAddress.phone' },
-          ordersCount: { $sum: 1 },
-          totalSpent: { $sum: { $ifNull: ['$totalAmount', '$total'] } },
-          lastOrderAt: { $max: '$createdAt' },
-        },
-      },
-      { $sort: { lastOrderAt: -1 } },
-      { $skip: skip },
-      { $limit: limit },
-    ];
+    // Group orders by email
+    const groupedOrders = await prisma.order.groupBy({
+      by: ['email'],
+      where: { email: { not: null }, ...orderFilter },
+      _count: { id: true },
+      _sum: { totalAmount: true, total: true },
+      _max: { createdAt: true },
+      orderBy: { _max: { createdAt: 'desc' } },
+      skip,
+      take: limit,
+    });
 
-    const [rows, totalAgg] = await Promise.all([
-      Order.aggregate(pipeline),
-      Order.aggregate([
-        { $match: match },
-        { $group: { _id: '$email' } },
-        { $count: 'total' },
-      ]),
-    ]);
-    const totalDistinct = totalAgg?.[0]?.total || 0;
+    // Get total distinct email count
+    const totalGrouped = await prisma.order.groupBy({
+      by: ['email'],
+      where: { email: { not: null }, ...orderFilter },
+      _count: { id: true },
+    });
+    const totalDistinct = totalGrouped.length;
 
+    // Get the latest shipping address for each email for name/phone info
+    const emails = groupedOrders.map((r: any) => r.email).filter(Boolean) as string[];
+    
     // Enrich with User info if exists
-    const emails = rows.map((r) => r.email).filter(Boolean);
-    const users = emails.length ? await User.find({ email: { $in: emails } }, 'email name _id createdAt') : [];
+    const users = emails.length
+      ? await prisma.user.findMany({
+          where: { email: { in: emails } },
+          select: { email: true, name: true, id: true, createdAt: true },
+        })
+      : [];
     const byEmail = new Map(users.map((u: any) => [u.email, u]));
 
-    const customers = rows.map((r) => {
-      const u = byEmail.get(r.email);
+    // Get latest order for each email to extract shipping address name/phone
+    const latestOrders = emails.length
+      ? await prisma.order.findMany({
+          where: { email: { in: emails } },
+          orderBy: { createdAt: 'desc' },
+          distinct: ['email'],
+          select: { email: true, shippingAddress: true },
+        })
+      : [];
+    const addrByEmail = new Map(latestOrders.map((o: any) => [o.email, o.shippingAddress as any]));
+
+    const customers = groupedOrders.map((r: any) => {
+      const u: any = byEmail.get(r.email!);
+      const addr: any = addrByEmail.get(r.email!) || {};
       return {
         email: r.email,
-        name: u?.name || r.name || '',
-        phone: r.phone || '',
-        ordersCount: r.ordersCount,
-        totalSpent: r.totalSpent || 0,
-        lastOrderAt: r.lastOrderAt,
-        userId: u?._id || null,
+        name: u?.name || addr?.name || '',
+        phone: addr?.phone || '',
+        ordersCount: r._count.id,
+        totalSpent: r._sum.totalAmount || r._sum.total || 0,
+        lastOrderAt: r._max.createdAt,
+        userId: u?.id || null,
         joinedAt: u?.createdAt || null,
       };
     });

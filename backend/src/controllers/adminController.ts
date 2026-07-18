@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
-import { Product } from '../models/Product';
-import { Order } from '../models/Order';
-import { User } from '../models/User';
+import { prisma } from '../config/database';
 
 function monthsBack(n: number) {
   const now = new Date();
@@ -11,50 +9,65 @@ function monthsBack(n: number) {
 
 export async function getAdminStats(_req: Request, res: Response) {
   try {
-    const [totalProducts, totalCustomers, totalOrders, distinctCategories] = await Promise.all([
-      Product.countDocuments({}),
-      User.countDocuments({}),
-      Order.countDocuments({}),
-      Product.distinct('category'),
+    const [totalProducts, totalCustomers, totalOrders] = await Promise.all([
+      prisma.product.count(),
+      prisma.user.count(),
+      prisma.order.count(),
     ]);
 
-    // Monthly orders for last 12 months
+    // Get distinct categories
+    const distinctCats = await prisma.product.findMany({
+      select: { category: true },
+      distinct: ['category'],
+    });
+
+    // Monthly orders for last 12 months (raw SQL for grouping by month)
     const since = monthsBack(12);
-    const monthlyAgg = await Order.aggregate([
-      { $match: { createdAt: { $gte: since } } },
-      {
-        $group: {
-          _id: { y: { $year: '$createdAt' }, m: { $month: '$createdAt' } },
-          count: { $sum: 1 },
-          total: { $sum: '$total' },
-        },
-      },
-      { $sort: { '_id.y': 1, '_id.m': 1 } },
-    ]);
+    const orders12m = await prisma.order.findMany({
+      where: { createdAt: { gte: since } },
+      select: { createdAt: true, total: true },
+    });
 
     const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const monthlyOrders = [] as Array<{ month: string; count: number; total: number }>;
-    // Fill 12 slots
     const now = new Date();
+    
+    // Build a map of year-month -> {count, total}
+    const monthMap = new Map<string, { count: number; total: number }>();
+    for (const o of orders12m) {
+      const d = new Date(o.createdAt);
+      const key = `${d.getFullYear()}-${d.getMonth() + 1}`;
+      const existing = monthMap.get(key) || { count: 0, total: 0 };
+      existing.count += 1;
+      existing.total += o.total || 0;
+      monthMap.set(key, existing);
+    }
+
     for (let i = 11; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const y = d.getFullYear();
       const m = d.getMonth() + 1;
-      const key = monthlyAgg.find((it: any) => it._id.y === y && it._id.m === m);
-      monthlyOrders.push({ month: `${monthNames[m - 1]} ${String(y).slice(-2)}`, count: key?.count || 0, total: key?.total || 0 });
+      const key = `${y}-${m}`;
+      const entry = monthMap.get(key);
+      monthlyOrders.push({ month: `${monthNames[m - 1]} ${String(y).slice(-2)}`, count: entry?.count || 0, total: entry?.total || 0 });
     }
 
     // Status distribution
-    const statusAgg = await Order.aggregate([
-      { $group: { _id: '$status', count: { $sum: 1 } } },
-    ]);
-    const orderStatusDistribution = statusAgg.map((s: any) => ({ status: s._id || 'Unknown', count: s.count }));
+    const allOrders = await prisma.order.groupBy({
+      by: ['status'],
+      _count: { status: true },
+    });
+    const orderStatusDistribution = allOrders.map((s: any) => ({ status: s.status || 'Unknown', count: s._count.status }));
 
     // Latest orders
-    const latestOrdersDocs = await Order.find({}).sort({ createdAt: -1 }).limit(10);
+    const latestOrdersDocs = await prisma.order.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+      include: { items: true },
+    });
     const latestOrders = latestOrdersDocs.map((o: any) => ({
-      id: o._id,
-      paymentId: o.paymentId || '-',
+      id: o.id,
+      paymentId: o.transactionId || '-',
       totalItems: Array.isArray(o.items) ? o.items.reduce((a: number, b: any) => a + (b.quantity || 0), 0) : 0,
       status: o.status,
       amount: o.total,
@@ -63,7 +76,7 @@ export async function getAdminStats(_req: Request, res: Response) {
 
     res.json({
       totals: {
-        totalCategories: (distinctCategories || []).filter(Boolean).length,
+        totalCategories: distinctCats.length,
         totalProducts,
         totalCustomers,
         totalOrders,
@@ -71,7 +84,7 @@ export async function getAdminStats(_req: Request, res: Response) {
       monthlyOrders,
       orderStatusDistribution,
       latestOrders,
-      latestReviews: [], // placeholder until Reviews model exists
+      latestReviews: [],
     });
   } catch (err) {
     console.error('Admin stats error:', err);

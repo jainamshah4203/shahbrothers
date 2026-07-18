@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import { Category } from '../models/Category';
-import { Types } from 'mongoose';
+import { prisma } from '../config/database';
 
 export async function listCategories(req: Request, res: Response) {
   try {
@@ -10,11 +9,21 @@ export async function listCategories(req: Request, res: Response) {
     const search = String(req.query.search || '').trim();
 
     const filter: any = {};
-    if (search) filter.$or = [{ name: new RegExp(search, 'i') }, { slug: new RegExp(search, 'i') }];
+    if (search) {
+      filter.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { slug: { contains: search, mode: 'insensitive' } },
+      ];
+    }
 
     const [items, count] = await Promise.all([
-      Category.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
-      Category.countDocuments(filter),
+      prisma.category.findMany({
+        where: filter,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.category.count({ where: filter }),
     ]);
 
     return res.json({
@@ -36,8 +45,7 @@ export async function listCategories(req: Request, res: Response) {
 export async function getCategoryById(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    if (!Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid id' });
-    const cat = await Category.findById(id);
+    const cat = await prisma.category.findUnique({ where: { id } });
     if (!cat) return res.status(404).json({ message: 'Category not found' });
     return res.json({ category: cat });
   } catch (err) {
@@ -50,9 +58,9 @@ export async function createCategory(req: Request, res: Response) {
   try {
     const { name, slug, description } = req.body || {};
     if (!name || !slug) return res.status(400).json({ message: 'name and slug are required' });
-    const exists = await Category.findOne({ slug });
+    const exists = await prisma.category.findUnique({ where: { slug } });
     if (exists) return res.status(409).json({ message: 'Slug already exists' });
-    const created = await Category.create({ name, slug, description });
+    const created = await prisma.category.create({ data: { name, slug, description } });
     return res.status(201).json({ category: created });
   } catch (err) {
     console.error('Create category error:', err);
@@ -63,13 +71,11 @@ export async function createCategory(req: Request, res: Response) {
 export async function updateCategory(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    if (!Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid id' });
     const patch: any = {};
     ['name', 'slug', 'description'].forEach((k) => {
       if (req.body && req.body[k] != null) patch[k] = req.body[k];
     });
-    const updated = await Category.findByIdAndUpdate(id, { $set: patch }, { new: true });
-    if (!updated) return res.status(404).json({ message: 'Category not found' });
+    const updated = await prisma.category.update({ where: { id }, data: patch });
     return res.json({ category: updated });
   } catch (err) {
     console.error('Update category error:', err);
@@ -80,9 +86,7 @@ export async function updateCategory(req: Request, res: Response) {
 export async function deleteCategory(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    if (!Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid id' });
-    const deleted = await Category.findByIdAndDelete(id);
-    if (!deleted) return res.status(404).json({ message: 'Category not found' });
+    await prisma.category.delete({ where: { id } });
     return res.json({ success: true });
   } catch (err) {
     console.error('Delete category error:', err);
