@@ -73,7 +73,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Health
 app.get('/health', (_req, res) => {
-  res.json({ status: 'OK', service: 'NIRAYA API', time: new Date().toISOString() });
+  res.json({ status: 'OK', service: 'SHAH BROTHERS API', time: new Date().toISOString() });
 });
 
 // Routes

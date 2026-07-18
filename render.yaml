@@ -20,7 +20,7 @@ services:
         # Set this in Render dashboard to your live storefront URL, e.g. https://niraya1303.vercel.app
         sync: false
       # Replace the values below with your real secrets in the Render dashboard after first deploy
-      - key: MONGO_URI
+      - key: DATABASE_URL
         sync: false
       - key: JWT_SECRET
         sync: false
