@@ -2,11 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ecom-store Design System - Premium feminine aesthetic for ecom-store */
-/* A design system for ecom-store, a luxury fashion e-commerce platform */
+/* Shah Brothers Design System - Premium feminine aesthetic for Shah Brothers */
+/* A design system for Shah Brothers, a luxury fashion e-commerce platform */
 /* This design system is built on top of Tailwind CSS and provides a set of */
 /* custom tokens and utility classes to create a consistent and beautiful */
-/* user interface for ecom-store */
+/* user interface for Shah Brothers */
 
 @layer base {
   :root {

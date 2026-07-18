@@ -41,7 +41,7 @@ function SidebarLink({ href, label, icon: Icon, active }: any) {
 }
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
-  const brand = (process.env.NEXT_PUBLIC_COMPANY_NAME as string) || 'ecom-store';
+  const brand = (process.env.NEXT_PUBLIC_COMPANY_NAME as string) || 'Shah Brothers';
   const pathname = usePathname();
   const router = useRouter();
   const [openProducts, setOpenProducts] = React.useState<boolean>(pathname?.startsWith("/products") ?? false);

@@ -400,7 +400,7 @@ export const generateInvoicePdf = async (req: Request, res: Response) => {
     doc.pipe(res);
 
     // Company header
-    const companyName = process.env.COMPANY_NAME || 'ecom-store';
+    const companyName = process.env.COMPANY_NAME || 'Shah Brothers';
     const companyGst = process.env.COMPANY_GST || '24AAACH7409R2Z6';
     const companyAddress = process.env.COMPANY_ADDRESS || '';
 
@@ -527,7 +527,7 @@ export const generateInvoicePdf = async (req: Request, res: Response) => {
     doc.font('Helvetica').fontSize(9).fillColor('#666666').text(
       `Thank you for shopping with ${companyName}. All sales are subject to our return & replacement policy.\n` +
       `Returns accepted within 7 days of delivery if the item is unused and in original condition with tags.\n` +
-      `For support, contact ${process.env.SUPPORT_EMAIL || 'support@ecom-store.example'}.`,
+      `For support, contact ${process.env.SUPPORT_EMAIL || 'support@shahbrothers.example'}.`,
       40,
       doc.y,
       { width: 500, align: 'center' }
