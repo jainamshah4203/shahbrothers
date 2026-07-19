@@ -8,5 +8,5 @@ export const metadata = {
 };
 
 export default function Page() {
-  redirect('/');
+  redirect('/collections?newOnly=1');
 }
