@@ -28,6 +28,11 @@ async function getProduct(slug: string): Promise<Product | null> {
     const data: any = await apiGet(`/products/slug/${slug}`);
     return data?.product ?? null;
   } catch {
+    const { mockProducts } = await import('@/data/products');
+    const found = mockProducts.find(p => p.slug === slug || p.id === slug);
+    if (found) {
+      return { ...found, _id: found.id } as unknown as Product;
+    }
     return null;
   }
 }

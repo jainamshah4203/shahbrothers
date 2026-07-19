@@ -48,8 +48,13 @@ function mapApiProduct(p: ApiProduct): Product {
 }
 
 export async function fetchFeaturedProducts(limit = 8): Promise<Product[]> {
-  const data: { products: ApiProduct[] } = await apiGet(`/products/featured?limit=${limit}`);
-  return (data.products || []).map(mapApiProduct);
+  try {
+    const data: { products: ApiProduct[] } = await apiGet(`/products/featured?limit=${limit}`);
+    return (data.products || []).map(mapApiProduct);
+  } catch (error) {
+    const { mockProducts } = await import('@/data/products');
+    return mockProducts.slice(0, limit);
+  }
 }
 
 export interface PaginatedProducts {
@@ -82,13 +87,32 @@ export async function fetchProducts(params: {
   Object.entries(params).forEach(([k, v]) => {
     if (v !== undefined && v !== null && v !== '') query.append(k, String(v));
   });
-  const data: { products: ApiProduct[]; pagination: PaginatedProducts['pagination'] } = await apiGet(
-    `/products${query.toString() ? `?${query.toString()}` : ''}`
-  );
-  return {
-    products: (data.products || []).map(mapApiProduct),
-    pagination: data.pagination,
-  };
+  try {
+    const data: { products: ApiProduct[]; pagination: PaginatedProducts['pagination'] } = await apiGet(
+      `/products${query.toString() ? `?${query.toString()}` : ''}`
+    );
+    return {
+      products: (data.products || []).map(mapApiProduct),
+      pagination: data.pagination,
+    };
+  } catch (error) {
+    const { mockProducts } = await import('@/data/products');
+    let prods = [...mockProducts];
+    if (params.category) prods = prods.filter(p => p.category === params.category);
+    if (params.bestSeller) prods = prods.filter(p => p.isBestseller);
+    if (params.saleOnly) prods = prods.filter(p => p.salePrice && p.salePrice < p.price);
+    
+    return {
+      products: prods,
+      pagination: {
+        currentPage: 1,
+        totalPages: 1,
+        totalProducts: prods.length,
+        hasNextPage: false,
+        hasPrevPage: false,
+      }
+    };
+  }
 }
 
 export async function fetchFeaturedFlagged(limit = 8): Promise<Product[]> {
