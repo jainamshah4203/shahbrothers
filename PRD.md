@@ -1,12 +1,12 @@
 # Product Specification Document  
-## Project: Clothing E-Commerce Website  
+## Project: Retail Stationery E-Commerce Website  
 ## Version: 1.0  
 ## Status: Production Ready  
 
 ---
 
 ## 1. Overview  
-The clothing e-commerce website will serve as a full-featured online store for selling women’s clothing. It will include a customer-facing storefront, secure checkout, order tracking, and an admin panel for product and order management.  
+The stationery e-commerce website will serve as a full-featured online store for selling retail stationery products from brands like Kangaro, Doms, and Flair. It will include a customer-facing storefront, secure checkout, order tracking, and an admin panel for product and order management.  
 
 ---
 
@@ -23,8 +23,8 @@ The clothing e-commerce website will serve as a full-featured online store for s
 
 ### 3.1 Customer Features  
 - **User Authentication**: Sign up, login, forgot password.  
-- **Product Catalog**: Browse by categories (Dresses, Tops, Bottoms, Accessories).  
-- **Product Details Page**: Images, description, price, size chart, reviews.  
+- **Product Catalog**: Browse by categories (Writing Instruments, Desktop Accessories, Art & Craft Supplies, Office Utilities).  
+- **Product Details Page**: Images, description, price, specifications, brand, reviews.  
 - **Cart & Wishlist**: Add/remove products, save favorites.  
 - **Checkout Flow**:  
   - Address & shipping selection  

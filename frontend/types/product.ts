@@ -12,8 +12,8 @@ export interface Product {
   isNew?: boolean;
   isBestseller?: boolean;
   limited?: boolean;
-  material: string;
-  careInstructions: string[];
+  specifications: string;
+  features: string[];
   // optional fields from backend
   slug?: string;
   brand?: string;

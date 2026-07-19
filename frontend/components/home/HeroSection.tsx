@@ -8,8 +8,8 @@ const HeroSection = () => {
       {/* Background Image */}
       <div className="absolute inset-0">
         <Image
-          src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=2000&q=80"
-          alt="Shah Brothers Fashion Collection"
+          src="https://images.unsplash.com/photo-1583485088034-697b5a69f000?auto=format&fit=crop&w=2000&q=80"
+          alt="Shah Brothers Stationery Collection"
           fill
           sizes="100vw"
           priority
@@ -23,21 +23,20 @@ const HeroSection = () => {
         <div className="max-w-2xl">
           <div className="animate-fade-in-up">
             <p className="text-sm uppercase tracking-wider text-white/90 mb-4">
-              Spring Collection 2024
+              Premium Stationery & Office Supplies
             </p>
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white leading-tight mb-6">
-              Timeless
+              Create
               <br />
-              <span className="italic">Elegance</span>
+              <span className="italic">Inspire</span>
             </h1>
             <p className="text-lg md:text-xl text-white/90 mb-8 max-w-lg">
-              Discover our curated collection of essential pieces that 
-              effortlessly blend comfort, style, and sustainability for 
-              the modern woman.
+              Discover our curated collection of premium writing instruments, notebooks, 
+              and desk accessories for the modern professional.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="luxury-button group">
-                Shop Collection
+                Shop Stationery
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
               <Button 
@@ -45,7 +44,7 @@ const HeroSection = () => {
                 variant="outline" 
                 className="bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
               >
-                Explore Lookbook
+                Explore Brands
               </Button>
             </div>
           </div>

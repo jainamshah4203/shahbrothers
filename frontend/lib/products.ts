@@ -15,8 +15,8 @@ export interface ApiProduct {
   stock: number;
   brand?: string;
   slug?: string;
-  material: string;
-  careInstructions: string[];
+  specifications: string;
+  features: string[];
   isNewProduct?: boolean;
   isBestseller?: boolean;
   createdAt?: string;
@@ -42,8 +42,8 @@ function mapApiProduct(p: ApiProduct): Product {
     isNew: !!p.isNewProduct,
     isBestseller: !!p.isBestseller,
     limited: !!(p as any).limited,
-    material: p.material,
-    careInstructions: p.careInstructions || [],
+    specifications: p.specifications,
+    features: p.features || [],
   };
 }
 

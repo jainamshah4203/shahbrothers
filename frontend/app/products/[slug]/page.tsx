@@ -117,14 +117,14 @@ function pick<T>(arr: T[], seed: number, salt: number): T {
 }
 
 function generateDeterministicDescription(name: string, category: string): string {
-  const adjectives = ["premium", "handcrafted", "minimal", "heritage", "timeless", "elegant", "versatile", "everyday"];
-  const fabrics = ["cotton", "linen", "silk blend", "wool blend", "rayon", "modal"];
-  const fits = ["regular fit", "relaxed fit", "tailored fit", "slim fit"];
-  const care = ["machine wash cold", "hand wash only", "dry clean recommended", "line dry in shade"];
+  const adjectives = ["premium", "durable", "minimal", "innovative", "reliable", "elegant", "versatile", "everyday"];
+  const materials = ["high-quality plastic", "metal", "eco-friendly materials", "premium paper", "stainless steel", "wood"];
+  const styles = ["ergonomic comfort", "professional use", "creative expressions", "smooth performance"];
+  const care = ["keep away from direct sunlight", "store in a cool place", "wipe with dry cloth", "handle with care"];
   const seed = hashSeed(`${name}|${category}`);
   const a = pick(adjectives, seed, 101);
-  const f = pick(fabrics, seed, 202);
-  const fit = pick(fits, seed, 303);
+  const m = pick(materials, seed, 202);
+  const style = pick(styles, seed, 303);
   const c = pick(care, seed, 404);
-  return `${name} is a ${a} ${category.toLowerCase()} crafted in soft ${f}. Designed for ${fit} comfort with attention to detail. Care: ${c}.`;
+  return `${name} is a ${a} ${category.toLowerCase()} crafted from ${m}. Designed for ${style} with attention to detail. Care: ${c}.`;
 }
