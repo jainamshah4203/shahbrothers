@@ -29,14 +29,14 @@ const InstagramFeed = () => {
     },
     {
       id: 4,
-      image: "https://images.unsplash.com/photo-1520692550186-b4ad74d39a3e?auto=format&fit=crop&w=400&q=80",
+      image: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80",
       caption: "Brighten up your notes with these vibrant highlighters",
       likes: 2103,
       date: "1 week ago",
     },
     {
       id: 5,
-      image: "https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=400&q=80",
+      image: "https://images.unsplash.com/photo-1531346878377-a5be20888e57?auto=format&fit=crop&w=400&q=80",
       caption: "Keep your desk organized and stylish",
       likes: 1432,
       date: "2 weeks ago",

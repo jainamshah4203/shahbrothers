@@ -16,7 +16,7 @@ const FeaturedCollections = () => {
       id: 2,
       title: "Desk Accessories",
       description: "Staplers, punches, and organizers",
-      image: "https://images.unsplash.com/photo-1595155146059-8d765790ab05?auto=format&fit=crop&w=1200&q=80",
+      image: "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=1200&q=80",
       itemCount: 30,
       isNew: true,
     },
