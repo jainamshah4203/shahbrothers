@@ -17,8 +17,8 @@ const Footer = () => {
               Shah Brothers
             </Link>
             <p className="text-muted-foreground mb-6 max-w-md">
-              Timeless pieces for the modern woman. Discover our curated collection
-              of essentials that blend comfort, style, and sustainability.
+              Premium writing instruments, notebooks, and desk accessories. Discover our curated collection
+              of essentials that blend functionality, style, and quality.
             </p>
             
             <div className="space-y-4">
@@ -42,12 +42,12 @@ const Footer = () => {
             <ul className="space-y-2">
               {[
                 "New Arrivals",
-                "Essentials",
-                "Dresses",
-                "Tops & Blouses",
-                "Bottoms",
-                "Outerwear",
-                "Accessories",
+                "Writing Instruments",
+                "Notebooks & Paper",
+                "Art Supplies",
+                "Desk Accessories",
+                "Filing & Storage",
+                "Gifting",
                 "Sale",
               ].map((link) => (
                 <li key={link}>
@@ -68,17 +68,17 @@ const Footer = () => {
             <ul className="space-y-2">
               {[
                 "Contact Us",
-                "Size Guide",
-                "Shipping & Replacement",
+                "Shipping Info",
+                "Return Policy",
                 "FAQ",
-                "Care Instructions",
+                "Corporate Orders",
                 "Privacy Policy",
                 "Terms of Service",
                 "Accessibility",
               ].map((link) => (
                 <li key={link}>
                   <Link
-                    href="#"
+                    href={link === "Return Policy" ? "/return-policy" : "#"}
                     className="text-muted-foreground hover:text-foreground transition-colors text-sm"
                   >
                     {link}

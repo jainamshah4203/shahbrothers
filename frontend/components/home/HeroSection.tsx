@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 const HeroSection = () => {
   return (
@@ -8,7 +9,7 @@ const HeroSection = () => {
       {/* Background Image */}
       <div className="absolute inset-0">
         <Image
-          src="https://images.unsplash.com/photo-1583485088034-697b5a69f000?auto=format&fit=crop&w=2000&q=80"
+          src="https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=2000&q=80"
           alt="Shah Brothers Stationery Collection"
           fill
           sizes="100vw"
@@ -35,16 +36,21 @@ const HeroSection = () => {
               and desk accessories for the modern professional.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="luxury-button group">
-                Shop Stationery
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <Button size="lg" className="luxury-button group" asChild>
+                <Link href="/collections">
+                  Shop Stationery
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
               </Button>
               <Button 
                 size="lg" 
                 variant="outline" 
                 className="bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
+                asChild
               >
-                Explore Brands
+                <Link href="/collections?q=brands">
+                  Explore Brands
+                </Link>
               </Button>
             </div>
           </div>
