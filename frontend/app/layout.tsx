@@ -20,9 +20,9 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Shah Brothers - Premium Fashion Collection",
-  description: "Discover sophisticated fashion with Shah Brothers' curated collection of premium clothing and accessories.",
-  keywords: ["fashion", "premium", "clothing", "accessories", "style", "elegance"],
+  title: "Shah Brothers - Premium Stationery & Office Supplies",
+  description: "Discover premium writing instruments, notebooks, and desk accessories curated by Shah Brothers.",
+  keywords: ["stationery", "premium", "office supplies", "pens", "notebooks", "desk accessories"],
   authors: [{ name: "Shah Brothers" }],
   creator: "Shah Brothers",
   publisher: "Shah Brothers",
@@ -35,14 +35,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://shahbrothers.example",
-    title: "Shah Brothers - Premium Fashion Collection",
-    description: "Discover sophisticated fashion with Shah Brothers' curated collection of premium clothing and accessories.",
+    title: "Shah Brothers - Premium Stationery & Office Supplies",
+    description: "Discover premium writing instruments, notebooks, and desk accessories curated by Shah Brothers.",
     siteName: "Shah Brothers",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Shah Brothers - Premium Fashion Collection",
-    description: "Discover sophisticated fashion with Shah Brothers' curated collection of premium clothing and accessories.",
+    title: "Shah Brothers - Premium Stationery & Office Supplies",
+    description: "Discover premium writing instruments, notebooks, and desk accessories curated by Shah Brothers.",
     creator: "@shah_brothers",
   },
   robots: {
