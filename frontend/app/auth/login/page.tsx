@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import LoginForm from "@/components/auth/LoginForm";
 
 export default function Page() {
@@ -6,7 +7,9 @@ export default function Page() {
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-semibold">Sign in</h1>
         <p className="text-muted-foreground mt-2 mb-6">Access your account to manage orders and wishlist.</p>
-        <LoginForm />
+        <Suspense fallback={<div className="h-40 animate-pulse bg-muted rounded-md" />}>
+          <LoginForm />
+        </Suspense>
       </main>
     </div>
   );
