@@ -114,27 +114,27 @@
   }
 
   h1 {
-    @apply text-hero;
+    @apply text-ds-hero;
   }
 
   h2 {
-    @apply text-section-title;
+    @apply text-ds-section;
   }
 
   h3 {
-    @apply text-subtitle;
+    @apply text-ds-subtitle;
   }
 
   h4 {
-    @apply text-product;
+    @apply text-ds-product;
   }
 
   h5 {
-    @apply text-body;
+    @apply text-ds-body;
   }
 
   h6 {
-    @apply text-caption;
+    @apply text-ds-caption;
   }
 
   /* Premium button styles */
