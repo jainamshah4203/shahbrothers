@@ -1,5 +1,3 @@
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -34,7 +32,6 @@ export default function Page() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-grow container mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-serif mb-4">The Journal</h1>
@@ -73,7 +70,6 @@ export default function Page() {
           ))}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

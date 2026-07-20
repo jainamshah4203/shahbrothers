@@ -1,5 +1,3 @@
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import BuyBox from "@/components/product/BuyBox";
 import Gallery from "@/components/product/Gallery";
 import Reviews from "@/components/product/Reviews";
@@ -58,7 +56,6 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   return (
     <div className="min-h-screen">
-      <Header />
       <main className="container mx-auto px-4 py-10">
         {!product ? (
           <div className="text-center py-20">
@@ -103,7 +100,6 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           </div>
         )}
       </main>
-      <Footer />
     </div>
   );
 }

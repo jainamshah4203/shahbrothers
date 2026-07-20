@@ -10,6 +10,13 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { formatINR } from "@/lib/formatCurrency";
 import { useCartStore } from "@/store/cart";
+import ProductCard from "@/components/product/ProductCard";
+import { useRevealAnimation } from "@/hooks/useRevealAnimation";
+
+const AnimatedProductItem = ({ children, index }: { children: React.ReactNode; index: number }) => {
+  const revealRef = useRevealAnimation<HTMLLIElement>({ preset: "fadeUp", delay: index * 0.05 });
+  return <li ref={revealRef} className="h-full">{children}</li>;
+};
 
 function normalizeImageUrl(src: string | undefined): string {
   if (!src) return "/placeholder.svg";
@@ -359,63 +366,9 @@ export default function CollectionsClient({ products }: Props) {
         ) : (
           <ul className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
             {current.map((p, i) => (
-              <li key={p.id} className="group">
-                <div className="relative">
-                  <Link href={p.slug ? `/products/${p.slug}` : `/products/id/${p.id}`} className="block">
-                    <div className="relative aspect-[3/4] overflow-hidden rounded-md border border-border bg-muted">
-                      <ImageWithFallback
-                        src={normalizeImageUrl(p.images?.[0])}
-                        alt={p.name}
-                        priority={i < 4}
-                        loading={i < 4 ? "eager" : "lazy"}
-                      />
-                      {/* Badges */}
-                      <div className="absolute top-3 left-3 flex flex-col gap-2">
-                        {p.isBestseller && (
-                          <Badge variant="secondary">BESTSELLER</Badge>
-                        )}
-                        {p.isNew && (
-                          <Badge className="bg-primary text-primary-foreground">NEW</Badge>
-                        )}
-                        {typeof p.salePrice === 'number' && p.salePrice < p.price && (
-                          <Badge className="bg-destructive text-destructive-foreground">-
-                            {Math.round(((p.price - p.salePrice) / p.price) * 100)}%
-                          </Badge>
-                        )}
-                        {p.limited && (
-                          <Badge variant="outline" className="bg-background/90">LIMITED</Badge>
-                        )}
-                      </div>
-                      {/* Hover Quick View button */}
-                      <div className={`absolute bottom-3 left-3 right-3 transition-all duration-300 ${"group-hover:opacity-100 group-hover:translate-y-0 opacity-0 translate-y-4"}`}>
-                        <Button
-                          className="w-full luxury-button"
-                          type="button"
-                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setQuickView(p); }}
-                        >
-                          Quick View
-                        </Button>
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-                <Link href={p.slug ? `/products/${p.slug}` : `/products/id/${p.id}`} className="block">
-                  <div className="mt-3">
-                    <p className="text-sm text-muted-foreground">{p.brand}</p>
-                    <h3 className="text-base font-medium line-clamp-1">{p.name}</h3>
-                    <div className="mt-1 flex items-center gap-2">
-                      {p.salePrice ? (
-                        <>
-                          <span className="font-semibold">₹{p.salePrice.toLocaleString("en-IN")}</span>
-                          <span className="text-sm text-muted-foreground line-through">₹{p.price.toLocaleString("en-IN")}</span>
-                        </>
-                      ) : (
-                        <span className="font-semibold">₹{p.price.toLocaleString("en-IN")}</span>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              </li>
+              <AnimatedProductItem key={p.id} index={i}>
+                <ProductCard product={p} onQuickView={setQuickView} />
+              </AnimatedProductItem>
             ))}
           </ul>
         )}

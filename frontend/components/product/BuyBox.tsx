@@ -5,6 +5,10 @@ import { useCartStore } from "@/store/cart";
 import { useWishlistStore } from "@/store/wishlist";
 import { useUIStore } from "@/store/ui";
 
+import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Minus, Plus } from "lucide-react";
+
 type BuyBoxProps = {
   product: {
     _id: string;
@@ -64,103 +68,90 @@ export default function BuyBox({ product }: BuyBoxProps) {
   const canAdd = inStock && (!needSize || size) && (!needColor || color);
 
   return (
-    <div className="mt-6 space-y-4">
+    <div className="mt-6 space-y-6">
       {/* Qty selector */}
-      <div className="flex items-center gap-3">
-        <label className="text-sm text-muted-foreground">Qty</label>
+      <div className="flex items-center gap-4">
+        <label className="text-sm font-medium text-muted-foreground w-12">Qty</label>
         <div className="inline-flex items-center gap-2">
-          <button
+          <Button
             type="button"
-            className="h-8 w-8 rounded border text-lg"
+            variant="outline"
+            size="icon"
+            className="h-8 w-8"
             onClick={() => setQty((q) => Math.max(1, q - 1))}
           >
-            -
-          </button>
-          <input
-            type="number"
-            min={1}
-            max={maxQty}
-            value={qty}
-            onChange={(e) => {
-              const v = parseInt(e.target.value || "1", 10);
-              if (Number.isFinite(v)) setQty(Math.min(Math.max(1, v), maxQty));
-            }}
-            className="h-8 w-16 rounded border text-center"
-          />
-          <button
+            <Minus className="h-3 w-3" />
+          </Button>
+          <span className="w-8 text-center text-sm font-medium">{qty}</span>
+          <Button
             type="button"
-            className="h-8 w-8 rounded border text-lg"
+            variant="outline"
+            size="icon"
+            className="h-8 w-8"
             onClick={() => setQty((q) => Math.min(q + 1, maxQty))}
           >
-            +
-          </button>
+            <Plus className="h-3 w-3" />
+          </Button>
         </div>
       </div>
 
       {needColor && (
-        <div>
-          <label className="text-sm text-muted-foreground">Color</label>
-          <div className="mt-2 flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-muted-foreground">Color</label>
+          <ToggleGroup type="single" value={color} onValueChange={(v) => { if(v) setColor(v); }} className="justify-start flex-wrap gap-2">
             {product.colors!.map((c) => (
-              <button
+              <ToggleGroupItem
                 key={c}
-                type="button"
-                onClick={() => setColor(c)}
-                className={`px-3 py-1 rounded border text-sm ${
-                  color === c ? "border-foreground" : "border-border"
-                }`}
+                value={c}
+                variant="outline"
+                className="h-9 px-4 text-sm hover:scale-105 transition-transform"
               >
                 {c}
-              </button>
+              </ToggleGroupItem>
             ))}
-          </div>
+          </ToggleGroup>
         </div>
       )}
 
       {needSize && (
-        <div>
-          <label className="text-sm text-muted-foreground">Size</label>
-          <div className="mt-2 flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-muted-foreground">Size</label>
+          <ToggleGroup type="single" value={size} onValueChange={(v) => { if(v) setSize(v); }} className="justify-start flex-wrap gap-2">
             {product.sizes!.map((s) => (
-              <button
+              <ToggleGroupItem
                 key={s}
-                type="button"
-                onClick={() => setSize(s)}
-                className={`px-3 py-1 rounded border text-sm ${
-                  size === s ? "border-foreground" : "border-border"
-                }`}
+                value={s}
+                variant="outline"
+                className="h-9 px-4 text-sm hover:scale-105 transition-transform"
               >
                 {s}
-              </button>
+              </ToggleGroupItem>
             ))}
-          </div>
+          </ToggleGroup>
         </div>
       )}
 
-      <div className="flex items-center gap-3">
-        <button
+      <div className="flex flex-col sm:flex-row items-center gap-3 pt-4">
+        <Button
           type="button"
           onClick={handleAdd}
           disabled={!canAdd}
-          className={`inline-flex items-center justify-center rounded-md px-5 py-2.5 text-sm font-medium transition-colors ${
-            canAdd
-              ? "bg-foreground text-background hover:opacity-90"
-              : "bg-muted text-muted-foreground cursor-not-allowed"
-          }`}
+          size="lg"
+          className="w-full sm:flex-1"
         >
-          Add to Cart
-        </button>
+          {canAdd ? "Add to Cart" : "Select Options"}
+        </Button>
 
         {mounted && (
-          <button
+          <Button
             type="button"
+            variant={hasWish ? "default" : "outline"}
+            size="lg"
             onClick={() => (hasWish ? removeWish(product._id) : addWish(product._id))}
-            className={`inline-flex items-center justify-center rounded-md px-4 py-2 text-sm border ${
-              hasWish ? "border-foreground" : "border-border"
-            }`}
+            className="w-full sm:w-auto"
           >
             {hasWish ? "Wishlisted" : "Add to Wishlist"}
-          </button>
+          </Button>
         )}
       </div>
     </div>

@@ -1,17 +1,14 @@
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 
 export default function ReturnPolicyPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-grow container mx-auto px-4 py-16 max-w-4xl">
         <h1 className="text-4xl font-serif mb-8 text-center">Return & Refund Policy</h1>
         
         <div className="prose prose-slate max-w-none space-y-6 text-muted-foreground">
           <p>
             At Shah Brothers, we take pride in the quality of our premium stationery and office supplies. 
-            If you are not entirely satisfied with your purchase, we're here to help.
+            If you are not entirely satisfied with your purchase, we&apos;re here to help.
           </p>
           
           <h2 className="text-2xl font-serif text-foreground mt-8 mb-4">1. Returns</h2>
@@ -26,7 +23,7 @@ export default function ReturnPolicyPage() {
             Once we receive your item, we will inspect it and notify you that we have received your returned item.
             We will immediately notify you on the status of your refund after inspecting the item.
             If your return is approved, we will initiate a refund to your credit card (or original method of payment).
-            You will receive the credit within a certain amount of days, depending on your card issuer's policies.
+            You will receive the credit within a certain amount of days, depending on your card issuer&apos;s policies.
           </p>
 
           <h2 className="text-2xl font-serif text-foreground mt-8 mb-4">3. Non-Returnable Items</h2>
@@ -52,7 +49,6 @@ export default function ReturnPolicyPage() {
           </p>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

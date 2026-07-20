@@ -11,6 +11,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { formatINR } from "@/lib/formatCurrency";
 import { useCartStore, type CartState } from "@/store/cart";
 import { useToast } from "@/hooks/use-toast";
+import { ProductQuickView } from "@/components/product/ProductQuickView";
+import { useRevealAnimation } from "@/hooks/useRevealAnimation";
+
+const AnimatedProductItem = ({ children, index }: { children: React.ReactNode; index: number }) => {
+  const revealRef = useRevealAnimation<HTMLDivElement>({ preset: "fadeUp", delay: index * 0.06 });
+  return <div ref={revealRef} className="snap-start shrink-0 w-[80%] sm:w-[50%] lg:w-[25%] h-full">{children}</div>;
+};
 
 function useCarousel() {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -64,141 +71,46 @@ export default function OnSaleStrip() {
   };
 
   return (
-    <section className="py-10">
+    <section className="py-16 bg-warm-white-50">
       <div className="container mx-auto px-4">
-        <div className="flex items-end justify-between mb-6">
+        <div className="flex items-end justify-between mb-8">
           <div>
-            <h2 className="text-2xl md:text-3xl font-serif">On Sale Now</h2>
-            <p className="text-sm text-muted-foreground">Limited time deals.</p>
+            <h2 className="text-ds-section font-serif text-soft-black-900 mb-2">On Sale Now</h2>
+            <p className="text-ds-subtitle text-warm-gray-500">Limited time deals.</p>
           </div>
-          <Button variant="ghost" size="sm" className="hidden md:flex group">
+          <Button variant="ghost" size="sm" className="hidden md:flex group text-wood-700 hover:text-wood-900 hover:bg-wood-100/50">
             View All
             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Button>
         </div>
         <div className="relative">
-          <div ref={c.ref} className="flex gap-5 overflow-x-auto scroll-smooth snap-x snap-mandatory px-1 pb-2" style={{ scrollbarWidth: 'none' }}>
+          <div ref={c.ref} className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory px-1 pb-4" style={{ scrollbarWidth: 'none' }}>
             {(isLoading ? Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="snap-start shrink-0 w-[80%] sm:w-[50%] lg:w-[25%] h-72 bg-muted/30 rounded-lg animate-pulse" />
+              <div key={i} className="snap-start shrink-0 w-[80%] sm:w-[50%] lg:w-[25%] h-80 bg-warm-gray-100 rounded-token-md animate-pulse" />
             )) : sale.slice(0, 12).map((p, i) => (
-              <div key={p.id || i} className="snap-start shrink-0 w-[80%] sm:w-[50%] lg:w-[25%] animate-fade-in-up" style={{ animationDelay: `${i * 0.06}s` }}>
+              <AnimatedProductItem key={p.id || i} index={i}>
                 <ProductCard product={p} onQuickView={() => setQuickView(p)} />
-              </div>
+              </AnimatedProductItem>
             )))}
           </div>
           <button type="button" aria-label="Previous" onClick={() => scroll(-1)} disabled={!multi && !c.canPrev}
-            className={`hidden md:grid absolute left-0 top-1/2 -translate-y-1/2 z-10 h-10 w-10 place-items-center rounded-full bg-black/70 text-white shadow hover:bg-black focus:outline-none ${(!multi && !c.canPrev) ? 'opacity-40 cursor-not-allowed' : ''}`}>
+            className={`hidden md:grid absolute left-0 top-1/2 -translate-y-1/2 z-10 h-10 w-10 place-items-center rounded-full bg-soft-black-900/70 text-warm-white-50 shadow-elevation-2 hover:bg-soft-black-900 focus:outline-none transition-colors ${(!multi && !c.canPrev) ? 'opacity-40 cursor-not-allowed' : ''}`}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
               <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           <button type="button" aria-label="Next" onClick={() => scroll(1)} disabled={!multi && !c.canNext}
-            className={`hidden md:grid absolute right-0 top-1/2 -translate-y-1/2 z-10 h-10 w-10 place-items-center rounded-full bg-black/70 text-white shadow hover:bg-black focus:outline-none ${(!multi && !c.canNext) ? 'opacity-40 cursor-not-allowed' : ''}`}>
+            className={`hidden md:grid absolute right-0 top-1/2 -translate-y-1/2 z-10 h-10 w-10 place-items-center rounded-full bg-soft-black-900/70 text-warm-white-50 shadow-elevation-2 hover:bg-soft-black-900 focus:outline-none transition-colors ${(!multi && !c.canNext) ? 'opacity-40 cursor-not-allowed' : ''}`}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
               <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         </div>
         {/* Quick View Modal */}
-        <Dialog open={!!quickView} onOpenChange={(open) => { if (!open) { setQuickView(null); setSelectedSize(null); setSelectedColor(null); } }}>
-          <DialogContent className="max-w-3xl">
-            {quickView && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <QVGallery images={quickView.images} name={quickView.name} />
-                <div>
-                  <DialogHeader>
-                    <DialogTitle className="text-lg md:text-xl font-semibold">{quickView.name}</DialogTitle>
-                  </DialogHeader>
-                  <div className="mt-2 text-xl font-semibold">{formatINR(quickView.salePrice ?? quickView.price)}</div>
-                  {quickView.salePrice && (
-                    <div className="text-sm text-muted-foreground line-through">{formatINR(quickView.price)}</div>
-                  )}
-
-                  {/* Sizes */}
-                  {Array.isArray(quickView.sizes) && quickView.sizes.length > 0 && (
-                    <div className="mt-4">
-                      <div className="text-xs mb-2 text-muted-foreground">Size</div>
-                      <div className="flex flex-wrap gap-2">
-                        {quickView.sizes.map((s) => (
-                          <button type="button" key={s} onClick={() => setSelectedSize(s)} className={`px-3 py-1.5 rounded border text-xs ${selectedSize === s ? 'bg-black text-white border-black' : 'hover:bg-accent'}`}>{s}</button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Colors */}
-                  {Array.isArray(quickView.colors) && quickView.colors.length > 0 && (
-                    <div className="mt-4">
-                      <div className="text-xs mb-2 text-muted-foreground">Color</div>
-                      <div className="flex flex-wrap gap-2">
-                        {quickView.colors.map((c, idx) => (
-                          <button type="button" key={`${c}-${idx}`} onClick={() => setSelectedColor(c)} className={`px-3 py-1.5 rounded border text-xs ${selectedColor === c ? 'bg-black text-white border-black' : 'hover:bg-accent'}`}>{c}</button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Actions */}
-                  <div className="mt-6">
-                    <Button
-                      onClick={() => {
-                        addToCart(quickView, { qty: 1, size: selectedSize || undefined, color: selectedColor || undefined });
-                        toast({ title: 'Added to cart', description: quickView.name });
-                        setQuickView(null);
-                        setSelectedSize(null);
-                        setSelectedColor(null);
-                      }}
-                      className="w-full"
-                      disabled={
-                        (Array.isArray(quickView.sizes) && quickView.sizes.length > 0 && !selectedSize) ||
-                        (Array.isArray(quickView.colors) && quickView.colors.length > 0 && !selectedColor)
-                      }
-                    >Add to Cart</Button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+        <ProductQuickView product={quickView} onClose={() => setQuickView(null)} />
       </div>
     </section>
   );
 }
 
-// Local gallery for Quick View (strings images)
-function QVGallery({ images, name }: { images: string[]; name: string }) {
-  const [idx, setIdx] = useState(0);
-  const safe = Array.isArray(images) && images.length > 0 ? images : ["/placeholder.svg"];
-  const prev = () => setIdx((i) => (i - 1 + safe.length) % safe.length);
-  const next = () => setIdx((i) => (i + 1) % safe.length);
-  return (
-    <div>
-      <div className="relative">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={safe[idx]} alt={`${name} image ${idx + 1}`} className="w-full aspect-[4/5] object-cover rounded" />
-        {safe.length > 1 && (
-          <>
-            <button type="button" aria-label="Previous image" onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center rounded-full bg-black/70 text-white shadow hover:bg-black">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <button type="button" aria-label="Next image" onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center rounded-full bg-black/70 text-white shadow hover:bg-black">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </>
-        )}
-      </div>
-      {safe.length > 1 && (
-        <div className="mt-2 flex gap-2 overflow-x-auto">
-          {safe.map((src, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={`${src}-${i}`} src={src} alt={`thumb ${i + 1}`} className={`h-16 w-12 object-cover rounded cursor-pointer border ${i === idx ? 'border-foreground' : 'border-transparent'}`} onClick={() => setIdx(i)} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+

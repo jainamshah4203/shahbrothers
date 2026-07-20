@@ -30,6 +30,9 @@ function normalizeImageUrl(src: string | undefined): string {
   }
 }
 
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
 export default function Gallery({ images, alt }: Props) {
   const prepared = useMemo(() => (images?.length ? images : ["/placeholder.svg"]).map((s) => normalizeImageUrl(s)), [images]);
   const [idx, setIdx] = useState(0);
@@ -40,12 +43,12 @@ export default function Gallery({ images, alt }: Props) {
   return (
     <div className="grid grid-cols-5 gap-4">
       {/* Thumbnails */}
-      <div className="col-span-1 space-y-3 max-h-[540px] overflow-auto pr-1 hidden sm:block">
+      <div className="col-span-1 space-y-3 max-h-[600px] overflow-auto pr-1 hidden sm:block custom-scrollbar">
         {prepared.map((src, i) => (
           <button
             key={i}
             onClick={() => setIdx(i)}
-            className={`relative w-full aspect-[3/4] overflow-hidden rounded border ${idx === i ? "border-foreground" : "border-border"}`}
+            className={`relative w-full aspect-[3/4] overflow-hidden rounded-md border-2 transition-all duration-300 ${idx === i ? "border-primary ring-2 ring-primary/20" : "border-transparent opacity-60 hover:opacity-100 hover:scale-[1.02]"}`}
           >
             <Image src={src} alt={`${alt} thumb ${i + 1}`} fill className="object-cover" unoptimized />
           </button>
@@ -53,32 +56,36 @@ export default function Gallery({ images, alt }: Props) {
       </div>
 
       {/* Main image with carousel controls */}
-      <div className="col-span-5 sm:col-span-4 relative aspect-[3/4] overflow-hidden rounded-md border border-border bg-muted">
-        <Image src={prepared[idx]} alt={alt} fill className="object-cover" unoptimized />
+      <div className="col-span-5 sm:col-span-4 relative aspect-[3/4] overflow-hidden rounded-lg bg-muted group">
+        <Image src={prepared[idx]} alt={alt} fill className="object-cover transition-transform duration-700 group-hover:scale-110 cursor-zoom-in" unoptimized />
         {prepared.length > 1 && (
-          <>
-            <button
-              type="button"
+          <div className="absolute inset-0 flex items-center justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <Button
+              variant="glass"
+              size="icon"
+              onClick={(e) => { e.stopPropagation(); prev(); }}
+              className="h-10 w-10 rounded-full"
               aria-label="Previous image"
-              onClick={prev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-black/40 text-white grid place-items-center"
             >
-              ‹
-            </button>
-            <button
-              type="button"
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="glass"
+              size="icon"
+              onClick={(e) => { e.stopPropagation(); next(); }}
+              className="h-10 w-10 rounded-full"
               aria-label="Next image"
-              onClick={next}
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-black/40 text-white grid place-items-center"
             >
-              ›
-            </button>
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-              {prepared.map((_, i) => (
-                <span key={i} className={`h-1.5 w-1.5 rounded-full ${i === idx ? "bg-white" : "bg-white/50"}`} />)
-              )}
-            </div>
-          </>
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          </div>
+        )}
+        {prepared.length > 1 && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+            {prepared.map((_, i) => (
+              <span key={i} className={`h-1.5 rounded-full transition-all duration-300 ${i === idx ? "w-6 bg-white" : "w-1.5 bg-white/50"}`} />)
+            )}
+          </div>
         )}
       </div>
     </div>

@@ -14,11 +14,7 @@ import { useWishlistStore, type WishlistState } from "@/store/wishlist";
 import { useUIStore } from "@/store/ui";
 import { useAuthStore } from "@/store/auth";
 
-interface HeaderProps {
-  cartItemsCount?: number;
-}
-
-const Header = ({ cartItemsCount = 0 }: HeaderProps) => {
+const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [mounted, setMounted] = useState(false);
@@ -196,12 +192,12 @@ const Header = ({ cartItemsCount = 0 }: HeaderProps) => {
             {/* Cart */}
             <Button variant="ghost" size="icon" className="relative" onClick={openMiniCart} aria-label="Cart">
               <ShoppingBag className="h-5 w-5" />
-              {mounted && (cartItemsCount || cartCount) > 0 && (
+              {mounted && cartCount > 0 && (
                 <Badge
                   variant="destructive"
                   className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center text-xs"
                 >
-                  {cartCount || cartItemsCount}
+                  {cartCount}
                 </Badge>
               )}
             </Button>

@@ -60,7 +60,11 @@ export const metadata: Metadata = {
  
 
 // Avoid static optimization during development to prevent refresh-only crashes
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic';
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+
+import AnimatedCursor from "@/components/Cursor/AnimatedCursor";
 
 export default function RootLayout({
   children,
@@ -70,6 +74,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${playfair.variable} antialiased`}>
+        <AnimatedCursor />
         <ClientProviders>
           <TooltipProvider>
             {children}

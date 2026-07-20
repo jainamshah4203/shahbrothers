@@ -1,5 +1,3 @@
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import CollectionsClient from "@/components/collections/CollectionsClient";
 import { API_URL } from "@/lib/api";
 import { fetchProducts } from "@/lib/products";
@@ -35,7 +33,6 @@ export default async function CollectionsPage({ searchParams }: { searchParams?:
 
   return (
     <div className="min-h-screen">
-      <Header />
       <main className="container mx-auto px-4 py-10">
         <div className="mb-6">
           <h1 className="text-3xl font-serif">Collections</h1>
@@ -51,7 +48,6 @@ export default async function CollectionsPage({ searchParams }: { searchParams?:
           <CollectionsClient products={products} />
         )}
       </main>
-      <Footer />
     </div>
   );
 }
