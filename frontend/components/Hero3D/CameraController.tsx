@@ -59,8 +59,8 @@ export default function CameraController({ scrollProgress }: CameraControllerPro
     const driftX = Math.cos(time * 0.25) * 0.04;
 
     // Mouse parallax
-    const parallaxX = mousePos.normalizedX * 0.8;
-    const parallaxY = mousePos.normalizedY * 0.8;
+    const parallaxX = mousePos.current.normalizedX * 0.8;
+    const parallaxY = mousePos.current.normalizedY * 0.8;
 
     const targetX = basePosition.current.x + parallaxX + driftX;
     const targetY = basePosition.current.y + parallaxY + breathY;
