@@ -8,6 +8,7 @@ import { ArrowRight } from "lucide-react";
 import { fetchFeaturedProducts } from "@/lib/products";
 import { useWishlistStore, type WishlistState } from "@/store/wishlist";
 import { ProductQuickView } from "@/components/product/ProductQuickView";
+import ProductCard from "@/components/product/ProductCard";
 import { useRevealAnimation } from "@/hooks/useRevealAnimation";
 
 const AnimatedProductItem = ({ children, index }: { children: React.ReactNode; index: number }) => {
