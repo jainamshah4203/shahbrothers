@@ -7,7 +7,7 @@ import * as THREE from "three";
 import Interactive3DPen from "@/components/stationery-3d/Interactive3DPen";
 
 /**
- * Mouse-lerped isometric studio for the hero fountain pen.
+ * Mouse-lerped isometric studio — background matches homepage #FAF9F5.
  */
 function MouseParallaxGroup({ children }: { children: React.ReactNode }) {
   const group = useRef<THREE.Group>(null);
@@ -42,15 +42,16 @@ export default function Hero3DCanvas() {
         antialias: true,
         alpha: true,
         powerPreference: "high-performance",
-        toneMappingExposure: 1.08,
+        toneMappingExposure: 1.05,
       }}
       camera={{ position: [2.1, 1.45, 2.8], fov: 32, near: 0.1, far: 50 }}
     >
-      <color attach="background" args={["#F4F1EA"]} />
-      <ambientLight color="#FFFDF9" intensity={0.65} />
+      {/* Match homepage Warm Off-White */}
+      <color attach="background" args={["#FAF9F5"]} />
+      <ambientLight color="#FFFDF9" intensity={0.7} />
       <directionalLight
         position={[4, 6, 3]}
-        intensity={1.3}
+        intensity={1.2}
         color="#FFE8C8"
         castShadow
         shadow-mapSize={[1024, 1024]}
@@ -58,7 +59,7 @@ export default function Hero3DCanvas() {
       />
       <directionalLight
         position={[-3, 2, -2]}
-        intensity={0.35}
+        intensity={0.32}
         color="#F5EDE3"
       />
 
@@ -68,9 +69,9 @@ export default function Hero3DCanvas() {
 
       <ContactShadows
         position={[0, -0.35, 0]}
-        opacity={0.35}
+        opacity={0.28}
         scale={8}
-        blur={2.4}
+        blur={2.6}
         far={4}
         color="#1A1A1A"
       />

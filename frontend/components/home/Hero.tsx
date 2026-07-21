@@ -9,22 +9,24 @@ const LazyHeroCanvas = lazy(() => import("./Hero3DCanvas"));
 
 /**
  * Asymmetrical editorial hero — serif copy left, interactive 3D pen right.
+ * Background matches homepage warm off-white for seamless contrast.
  */
 export const Hero: React.FC = () => {
   return (
     <section className="relative overflow-hidden bg-warm-off-white">
+      {/* Soft atmosphere — same family as page canvas, no hard panel contrast */}
       <div
         className="pointer-events-none absolute inset-0"
         aria-hidden
         style={{
           background:
-            "radial-gradient(ellipse at 18% 0%, rgba(244,241,234,0.95), transparent 55%), radial-gradient(ellipse at 92% 70%, rgba(212,175,55,0.08), transparent 45%), radial-gradient(ellipse at 70% 100%, rgba(28,45,66,0.05), transparent 40%)",
+            "radial-gradient(ellipse at 15% 10%, rgba(244,241,234,0.55), transparent 50%), radial-gradient(ellipse at 88% 60%, rgba(239,236,230,0.4), transparent 45%)",
         }}
       />
 
-      <div className="container relative mx-auto grid min-h-[min(92vh,880px)] grid-cols-1 items-center gap-10 px-4 py-14 lg:grid-cols-12 lg:gap-8 lg:py-20">
+      <div className="container relative z-[1] mx-auto grid min-h-[min(88vh,820px)] grid-cols-1 items-center gap-8 px-4 py-12 lg:grid-cols-12 lg:gap-6 lg:px-8 lg:py-16 xl:px-12">
         <motion.div
-          className="lg:col-span-5"
+          className="lg:col-span-5 lg:pr-4"
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
@@ -61,7 +63,7 @@ export const Hero: React.FC = () => {
 
         <motion.div
           className="relative lg:col-span-7"
-          initial={{ opacity: 0, x: 32 }}
+          initial={{ opacity: 0, x: 28 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{
             duration: 0.85,
@@ -69,8 +71,8 @@ export const Hero: React.FC = () => {
             ease: [0.22, 1, 0.36, 1],
           }}
         >
-          <div className="relative mx-auto aspect-[5/4] w-full max-w-xl overflow-hidden rounded-[2px] bg-cream shadow-paper lg:ml-auto lg:max-w-none">
-            <div className="absolute inset-0 debossed" aria-hidden />
+          {/* Flush with page — warm-off-white studio, no cream card contrast */}
+          <div className="relative mx-auto aspect-[5/4] w-full max-w-xl overflow-hidden bg-warm-off-white lg:ml-auto lg:max-w-none">
             <Suspense
               fallback={
                 <StationeryPreviewSkeleton label="Warming the studio…" />

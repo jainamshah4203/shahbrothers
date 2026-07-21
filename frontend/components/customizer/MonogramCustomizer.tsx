@@ -68,7 +68,7 @@ export const MonogramCustomizer: React.FC<MonogramCustomizerProps> = ({
 
   return (
     <section
-      className={cn("section-spacing bg-cream", className)}
+      className={cn("section-spacing bg-warm-off-white", className)}
       aria-labelledby="monogram-heading"
     >
       <div className="container mx-auto px-4">

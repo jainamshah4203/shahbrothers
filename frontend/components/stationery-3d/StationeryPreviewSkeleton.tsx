@@ -11,11 +11,11 @@ export default function StationeryPreviewSkeleton({
 }) {
   return (
     <div
-      className="relative flex h-full min-h-[320px] w-full items-end overflow-hidden bg-cream"
+      className="relative flex h-full min-h-[320px] w-full items-end overflow-hidden bg-warm-off-white"
       aria-busy="true"
       aria-label={label}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(250,249,245,1),transparent_55%),radial-gradient(ellipse_at_80%_70%,rgba(239,236,230,0.9),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(244,241,234,0.5),transparent_55%),radial-gradient(ellipse_at_80%_70%,rgba(239,236,230,0.45),transparent_50%)]" />
 
       {/* Flatlay silhouettes */}
       <div className="absolute left-[18%] top-[22%] h-[48%] w-[34%] rotate-[-8deg] rounded-[2px] bg-linen shadow-[0_18px_40px_-16px_rgba(26,26,26,0.12)]" />

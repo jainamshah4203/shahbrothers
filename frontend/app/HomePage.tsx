@@ -14,18 +14,28 @@ const ScrollStationeryAnimation = dynamic(
   { ssr: false }
 );
 
+/**
+ * Homepage composition.
+ * Side-pan stationery physics floats above section backgrounds (pointer-events none)
+ * so crayons/pencils remain visible in left/right gutters while scrolling.
+ */
 export default function HomePage() {
   return (
-    <div className="relative min-h-screen bg-warm-off-white">
+    <div className="relative min-h-screen overflow-x-clip bg-warm-off-white">
+      {/* Fixed gutter layer — z above sections, never captures clicks */}
       <ScrollStationeryAnimation />
-      <main className="relative z-10">
-        <Hero />
-        <Categories />
-        <NewArrivals />
-        <MonogramCustomizer />
-        <OnSaleStrip />
-        <BestSellersStrip />
-        <InstagramFeed />
+
+      <main className="relative z-[1]">
+        {/* Inner column keeps product UI clear of side pans on wide screens */}
+        <div className="mx-auto w-full max-w-[1600px] md:px-[min(12vw,148px)]">
+          <Hero />
+          <Categories />
+          <NewArrivals />
+          <MonogramCustomizer />
+          <OnSaleStrip />
+          <BestSellersStrip />
+          <InstagramFeed />
+        </div>
       </main>
     </div>
   );

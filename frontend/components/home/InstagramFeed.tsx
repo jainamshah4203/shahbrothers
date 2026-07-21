@@ -51,17 +51,17 @@ const InstagramFeed = () => {
   ];
 
   return (
-    <section className="py-20 bg-muted/30">
+    <section className="bg-warm-off-white py-20">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <div className="flex items-center justify-center mb-4">
-            <Instagram className="h-8 w-8 mr-3" />
-            <h2 className="text-4xl md:text-5xl font-serif">
+        <div className="mb-16 text-center">
+          <div className="mb-4 flex items-center justify-center">
+            <Instagram className="mr-3 h-8 w-8 text-charcoal-ink" />
+            <h2 className="font-serif text-4xl text-charcoal-ink md:text-5xl">
               @shahbrothers
             </h2>
           </div>
-          <p className="text-lg text-muted-foreground">
+          <p className="font-sans text-lg text-muted-sepia">
             Follow our journey and get styled with Shah Brothers
           </p>
         </div>
