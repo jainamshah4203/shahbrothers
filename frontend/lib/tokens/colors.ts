@@ -1,9 +1,18 @@
 export const colorTokens = {
-  // Warm Whites
-  'warm-white-50': '#FCFCFB',
-  'warm-white-100': '#F9F8F6',
-  'warm-white-200': '#F3F0EB',
-  
+  // Luxury stationery surfaces
+  'warm-off-white': '#FAF9F5',
+  cream: '#F4F1EA',
+  linen: '#EFECE6',
+
+  // Legacy warm-white aliases (map onto stationery surfaces)
+  'warm-white-50': '#FAF9F5',
+  'warm-white-100': '#F4F1EA',
+  'warm-white-200': '#EFECE6',
+
+  // Ink & sepia
+  'charcoal-ink': '#1A1A1A',
+  'warm-sepia': '#4A443F',
+
   // Soft Blacks
   'soft-black-900': '#1A1A1A',
   'soft-black-800': '#2A2A2A',
@@ -30,10 +39,10 @@ export const colorTokens = {
   'leather-700': '#7F4016',
   'leather-900': '#4A2309',
 
-  // Warm Gray
-  'warm-gray-100': '#F5F5F4',
+  // Warm Gray (aligned to stationery neutrals)
+  'warm-gray-100': '#F4F1EA',
   'warm-gray-300': '#D6D3D1',
   'warm-gray-500': '#A8A29E',
-  'warm-gray-700': '#57534E',
-  'warm-gray-900': '#292524',
+  'warm-gray-700': '#4A443F',
+  'warm-gray-900': '#1A1A1A',
 } as const;

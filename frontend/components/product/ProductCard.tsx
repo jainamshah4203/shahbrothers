@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart } from "lucide-react";
@@ -19,15 +19,44 @@ interface ProductCardProps {
   hideBestsellerBadge?: boolean;
 }
 
-const ProductCard = ({ 
-  product, 
-  onQuickView, 
-  onAddToWishlist, 
+const PAPER_GRAIN_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
+
+/** Resolve a minimalist stationery attribute badge (GSM or binding). */
+function getStationeryTag(product: Product & { [key: string]: any }): string | null {
+  if (product.paperWeight) return String(product.paperWeight);
+  if (product.bindingStyle) return String(product.bindingStyle);
+
+  const spec = String(product.specifications || "");
+  const gsm = spec.match(/(\d+)\s*GSM/i);
+  if (gsm) return `${gsm[1]} GSM`;
+
+  const binding = spec.match(
+    /(thread|stitch|perfect|saddle|case|spiral|wire|leather)\s*-?\s*bound/i
+  );
+  if (binding) {
+    return binding[0]
+      .split(/\s+/)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(" ");
+  }
+
+  if (/ruled|dotted|grid|plain/i.test(spec)) {
+    const paper = spec.match(/(ruled|dotted|grid|plain)/i);
+    if (paper) return paper[1].charAt(0).toUpperCase() + paper[1].slice(1).toLowerCase();
+  }
+
+  return null;
+}
+
+const ProductCard = ({
+  product,
+  onQuickView,
+  onAddToWishlist,
   hideBestsellerBadge,
 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
+
   const tiltRef = useTiltEffect<HTMLDivElement>({ scale: 1.02 });
   const wishlist = useWishlistStore((s: any) => s);
   const isWishlisted = wishlist?.items?.some((id: string) => id === product.id);
@@ -61,112 +90,139 @@ const ProductCard = ({
     ? Math.round(((product.price - (product.salePrice as number)) / product.price) * 100)
     : 0;
   const slug = (product as any).slug || product.id;
+  const stationeryTag = getStationeryTag(product);
 
   return (
     <div ref={tiltRef} className="h-full">
       <Card
-        className="product-card group relative border-none shadow-none bg-transparent overflow-hidden h-full flex flex-col"
+        className="product-card group relative flex h-full flex-col overflow-hidden border-none bg-cream shadow-none transition-[box-shadow,transform] duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_10px_30px_-5px_rgba(26,26,26,0.08)]"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
+        {/* Paper grain texture */}
+        <div
+          className="pointer-events-none absolute inset-0 z-[1] opacity-[0.04] mix-blend-multiply"
+          aria-hidden
+          style={{ backgroundImage: PAPER_GRAIN_SVG }}
+        />
+
         {/* Product Image */}
-        <div className="relative overflow-hidden bg-warm-gray-100 rounded-token-md mb-4">
+        <div className="relative mb-4 overflow-hidden rounded-token-md bg-linen">
           <Link href={`/products/${slug}`} className="relative block aspect-[3/4]">
             <Image
               src={product.images[currentImageIndex] || "/placeholder.svg"}
               alt={product.name}
               fill
               sizes="(min-width:1024px) 25vw, (min-width:640px) 33vw, 100vw"
-              className="object-cover transition-transform duration-700"
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
               onMouseEnter={handleImageHover}
               onMouseLeave={handleImageLeave}
               priority={false}
             />
           </Link>
 
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
-          {isNew && (
-            <Badge className="bg-primary text-primary-foreground">NEW</Badge>
-          )}
-          {isBest && !hideBestsellerBadge && (
-            <Badge variant="secondary">BESTSELLER</Badge>
-          )}
-          {hasSale && (
-            <Badge className="bg-destructive text-destructive-foreground">
-              -{discountPercentage}%
-            </Badge>
-          )}
-          {isLimited && (
-            <Badge variant="outline" className="bg-background/90">LIMITED</Badge>
-          )}
-          {!product.inStock && (
-            <Badge variant="outline" className="bg-background/90">
-              OUT OF STOCK
-            </Badge>
-          )}
-        </div>
-
-        {/* Quick Actions */}
-        <div className={`absolute top-3 right-3 flex flex-col gap-2 transition-opacity duration-300 ${
-          isHovered || isWishlisted ? "opacity-100" : "opacity-0"
-        }`}>
-          <Button
-            size="icon"
-            variant="secondary"
-            className={`h-10 w-10 rounded-full shadow-elevation-1 transition-colors ${isWishlisted ? "bg-red-50 text-red-500 hover:bg-red-100" : "bg-warm-white-50 text-soft-black-900 hover:bg-warm-gray-100"}`}
-            onClick={toggleWishlist}
-          >
-            <Heart className={`h-4 w-4 ${isWishlisted ? "fill-current" : ""}`} />
-          </Button>
-        </div>
-
-        {/* Quick View Button - appears on hover */}
-        <div className="absolute inset-x-0 bottom-0 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 p-3">
-          <Button
-            variant="secondary"
-            className="w-full bg-warm-white-50/90 backdrop-blur text-soft-black-900 hover:bg-soft-black-900 hover:text-warm-white-50 shadow-floating"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onQuickView?.(product);
-            }}
-          >
-            Quick View
-          </Button>
-        </div>
-      </div>
-
-      {/* Product Info */}
-      <div className="space-y-1 mt-auto">
-        <div className="flex items-center gap-2 text-ds-caption text-warm-gray-500">
-          <span>{product.category}</span>
-        </div>
-        
-        <Link href={`/products/${slug}`}>
-          <h3 className="font-medium text-ds-product text-soft-black-900 hover:text-wood-700 transition-colors line-clamp-2">
-            {product.name}
-          </h3>
-        </Link>
-
-        <div className="flex items-center gap-2 mt-2">
-          {product.salePrice ? (
-            <>
-              <span className="text-ds-price text-destructive">
-                {formatINR(product.salePrice)}
-              </span>
-              <span className="text-ds-caption text-warm-gray-500 line-through">
-                {formatINR(product.price)}
-              </span>
-            </>
-          ) : (
-            <span className="text-ds-price text-soft-black-900">
-              {formatINR(product.price)}
+          {/* Stationery attribute badge — top corner */}
+          {stationeryTag && (
+            <span className="absolute left-3 top-3 z-[2] border border-charcoal-ink/15 bg-warm-off-white/90 px-2.5 py-1 font-sans text-[0.65rem] font-medium uppercase tracking-[0.14em] text-charcoal-ink backdrop-blur-sm">
+              {stationeryTag}
             </span>
           )}
+
+          {/* Status badges */}
+          <div
+            className={`absolute flex flex-col gap-2 z-[2] ${
+              stationeryTag ? "left-3 top-11" : "left-3 top-3"
+            }`}
+          >
+            {isNew && (
+              <Badge className="bg-primary text-primary-foreground">NEW</Badge>
+            )}
+            {isBest && !hideBestsellerBadge && (
+              <Badge variant="secondary">BESTSELLER</Badge>
+            )}
+            {hasSale && (
+              <Badge className="bg-destructive text-destructive-foreground">
+                -{discountPercentage}%
+              </Badge>
+            )}
+            {isLimited && (
+              <Badge variant="outline" className="bg-background/90">
+                LIMITED
+              </Badge>
+            )}
+            {!product.inStock && (
+              <Badge variant="outline" className="bg-background/90">
+                OUT OF STOCK
+              </Badge>
+            )}
+          </div>
+
+          {/* Quick Actions */}
+          <div
+            className={`absolute top-3 right-3 z-[2] flex flex-col gap-2 transition-opacity duration-300 ${
+              isHovered || isWishlisted ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <Button
+              size="icon"
+              variant="secondary"
+              className={`h-10 w-10 rounded-full shadow-elevation-1 transition-colors ${
+                isWishlisted
+                  ? "bg-red-50 text-red-500 hover:bg-red-100"
+                  : "bg-warm-white-50 text-soft-black-900 hover:bg-warm-gray-100"
+              }`}
+              onClick={toggleWishlist}
+            >
+              <Heart className={`h-4 w-4 ${isWishlisted ? "fill-current" : ""}`} />
+            </Button>
+          </div>
+
+          {/* Quick View */}
+          <div className="absolute inset-x-0 bottom-0 z-[2] translate-y-4 p-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+            <Button
+              variant="secondary"
+              className="w-full border border-charcoal-ink/20 bg-warm-off-white/90 text-charcoal-ink shadow-none backdrop-blur transition-colors hover:bg-charcoal-ink hover:text-warm-off-white"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onQuickView?.(product);
+              }}
+            >
+              Quick View
+            </Button>
+          </div>
         </div>
-      </div>
-    </Card>
+
+        {/* Product Info */}
+        <div className="relative z-[1] mt-auto space-y-1 px-1 pb-1">
+          <div className="flex items-center gap-2 text-ds-caption text-warm-sepia">
+            <span>{product.category}</span>
+          </div>
+
+          <Link href={`/products/${slug}`}>
+            <h3 className="line-clamp-2 font-medium text-ds-product text-charcoal-ink transition-colors hover:text-wood-700">
+              {product.name}
+            </h3>
+          </Link>
+
+          <div className="mt-2 flex items-center gap-2">
+            {product.salePrice ? (
+              <>
+                <span className="text-ds-price text-destructive">
+                  {formatINR(product.salePrice)}
+                </span>
+                <span className="text-ds-caption text-warm-sepia line-through">
+                  {formatINR(product.price)}
+                </span>
+              </>
+            ) : (
+              <span className="text-ds-price text-charcoal-ink">
+                {formatINR(product.price)}
+              </span>
+            )}
+          </div>
+        </div>
+      </Card>
     </div>
   );
 };

@@ -17,6 +17,10 @@ export interface Product {
   // optional fields from backend
   slug?: string;
   brand?: string;
+  /** e.g. "120 GSM" — shown as a minimalist product badge */
+  paperWeight?: string;
+  /** e.g. "Thread Bound", "Staple Bound" */
+  bindingStyle?: string;
 }
 
 export interface CartItem {

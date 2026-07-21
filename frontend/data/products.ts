@@ -70,6 +70,8 @@ export const mockProducts: Product[] = [
     isNew: true,
     isBestseller: false,
     specifications: "200 Pages, 120 GSM",
+    paperWeight: "120 GSM",
+    bindingStyle: "Leather Bound",
     features: ["Lays flat when open", "Ribbon bookmark"]
   },
   {
@@ -157,6 +159,8 @@ export const mockProducts: Product[] = [
     isNew: false,
     isBestseller: true,
     specifications: "192 Pages, Ruled, 80 GSM",
+    paperWeight: "80 GSM",
+    bindingStyle: "Hard Bound",
     features: ["Elastic closure", "Inner pocket"]
   },
   {

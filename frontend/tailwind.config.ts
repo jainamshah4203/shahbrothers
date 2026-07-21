@@ -18,6 +18,22 @@ const config: Config = {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: [
+					'var(--font-inter)',
+					'Inter',
+					'ui-sans-serif',
+					'system-ui',
+					'sans-serif',
+				],
+				serif: [
+					'var(--font-playfair)',
+					'Playfair Display',
+					'Georgia',
+					'Times New Roman',
+					'serif',
+				],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -62,11 +78,21 @@ const config: Config = {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Design System Colors
+				// Luxury stationery palette
+				'warm-off-white': '#FAF9F5',
+				cream: {
+					DEFAULT: '#F4F1EA',
+					50: '#FAF9F5',
+					100: '#F4F1EA',
+					200: '#EFECE6',
+				},
+				linen: '#EFECE6',
+				'charcoal-ink': '#1A1A1A',
+				'warm-sepia': '#4A443F',
 				'warm-white': {
-					50: '#FCFCFB',
-					100: '#F9F8F6',
-					200: '#F3F0EB',
+					50: '#FAF9F5',
+					100: '#F4F1EA',
+					200: '#EFECE6',
 				},
 				'soft-black': {
 					900: '#1A1A1A',
@@ -95,11 +121,11 @@ const config: Config = {
 					900: '#4A2309',
 				},
 				'warm-gray': {
-					100: '#F5F5F4',
+					100: '#F4F1EA',
 					300: '#D6D3D1',
 					500: '#A8A29E',
-					700: '#57534E',
-					900: '#292524',
+					700: '#4A443F',
+					900: '#1A1A1A',
 				},
 			},
 			spacing: {
@@ -129,6 +155,7 @@ const config: Config = {
 				glass: '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
 				premium: '0 30px 60px -12px rgba(50, 50, 93, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.3)',
 				inset: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
+				editorial: '0 10px 30px -5px rgba(26, 26, 26, 0.08)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -144,10 +171,19 @@ const config: Config = {
 				'ds-hero': ['clamp(3rem, 5vw + 1rem, 5rem)', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
 				'ds-section': ['clamp(2rem, 3vw + 1rem, 3.5rem)', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '600' }],
 				'ds-subtitle': ['1.5rem', { lineHeight: '1.4', fontWeight: '500' }],
-				'ds-body': ['1rem', { lineHeight: '1.6', fontWeight: '400' }],
+				'ds-body': ['1rem', { lineHeight: '1.65', letterSpacing: '-0.011em', fontWeight: '400' }],
 				'ds-product': ['1.125rem', { lineHeight: '1.5', fontWeight: '500' }],
 				'ds-price': ['1.25rem', { lineHeight: '1.4', fontWeight: '600' }],
-				'ds-caption': ['0.875rem', { lineHeight: '1.4', fontWeight: '400' }],
+				'ds-caption': ['0.875rem', { lineHeight: '1.5', letterSpacing: '-0.011em', fontWeight: '400' }],
+			},
+			letterSpacing: {
+				tightest: '-0.02em',
+				tighter: '-0.015em',
+				tight: '-0.011em',
+			},
+			lineHeight: {
+				body: '1.65',
+				relaxed: '1.7',
 			},
 			keyframes: {
 				'accordion-down': {
