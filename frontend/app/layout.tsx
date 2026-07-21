@@ -1,28 +1,41 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ClientProviders } from "./providers";
-import MiniCart from "@/components/cart/MiniCart";
+import CartDrawer from "@/components/cart/CartDrawer";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import AnimatedCursor from "@/components/Cursor/AnimatedCursor";
 
-const inter = Inter({ 
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-plus-jakarta",
   display: "swap",
 });
 
-const playfair = Playfair_Display({ 
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  variable: "--font-playfair",
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-cormorant",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Shah Brothers - Premium Stationery & Office Supplies",
-  description: "Discover premium writing instruments, notebooks, and desk accessories curated by Shah Brothers.",
-  keywords: ["stationery", "premium", "office supplies", "pens", "notebooks", "desk accessories"],
+  title: "Shah Brothers — Artisan Stationery House",
+  description:
+    "Curated writing instruments, notebooks, and desk objects. Personalized foil, archival papers, and stationery with presence.",
+  keywords: [
+    "stationery",
+    "fountain pens",
+    "notebooks",
+    "foil stamping",
+    "desk accessories",
+    "Shah Brothers",
+  ],
   authors: [{ name: "Shah Brothers" }],
   creator: "Shah Brothers",
   publisher: "Shah Brothers",
@@ -34,15 +47,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://shahbrothers.example",
-    title: "Shah Brothers - Premium Stationery & Office Supplies",
-    description: "Discover premium writing instruments, notebooks, and desk accessories curated by Shah Brothers.",
+    url: "https://shahbrothers.vercel.app",
+    title: "Shah Brothers — Artisan Stationery House",
+    description:
+      "Curated writing instruments, notebooks, and desk objects. Personalized foil, archival papers, and stationery with presence.",
     siteName: "Shah Brothers",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Shah Brothers - Premium Stationery & Office Supplies",
-    description: "Discover premium writing instruments, notebooks, and desk accessories curated by Shah Brothers.",
+    title: "Shah Brothers — Artisan Stationery House",
+    description:
+      "Curated writing instruments, notebooks, and desk objects. Personalized foil, archival papers, and stationery with presence.",
     creator: "@shah_brothers",
   },
   robots: {
@@ -57,14 +72,6 @@ export const metadata: Metadata = {
     },
   },
 };
- 
-
-// Avoid static optimization during development to prevent refresh-only crashes
-// export const dynamic = 'force-dynamic';
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-
-import AnimatedCursor from "@/components/Cursor/AnimatedCursor";
 
 export default function RootLayout({
   children,
@@ -73,14 +80,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased tracking-tight`}>
+      <body
+        className={`${plusJakarta.variable} ${cormorant.variable} font-sans antialiased tracking-tight bg-warm-off-white paper-grain`}
+      >
         <AnimatedCursor />
         <ClientProviders>
           <TooltipProvider>
-            {children}
+            <div className="relative flex min-h-screen flex-col">
+              <Navbar />
+              <div className="relative z-10 flex-1">{children}</div>
+              <Footer />
+            </div>
             <Toaster />
             <Sonner />
-            <MiniCart />
+            <CartDrawer />
           </TooltipProvider>
         </ClientProviders>
       </body>

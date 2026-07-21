@@ -95,7 +95,7 @@ const ProductCard = ({
   return (
     <div ref={tiltRef} className="h-full">
       <Card
-        className="product-card group relative flex h-full flex-col overflow-hidden border-none bg-cream shadow-none transition-[box-shadow,transform] duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_10px_30px_-5px_rgba(26,26,26,0.08)]"
+        className="product-card group relative flex h-full flex-col overflow-hidden border-none bg-cream shadow-deboss transition-[box-shadow,transform] duration-500 ease-out hover:-translate-y-1.5 hover:shadow-paper"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -181,7 +181,7 @@ const ProductCard = ({
           <div className="absolute inset-x-0 bottom-0 z-[2] translate-y-4 p-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
             <Button
               variant="secondary"
-              className="w-full border border-charcoal-ink/20 bg-warm-off-white/90 text-charcoal-ink shadow-none backdrop-blur transition-colors hover:bg-charcoal-ink hover:text-warm-off-white"
+              className="w-full rounded-full border border-charcoal-ink/20 bg-warm-off-white/90 font-sans text-sm tracking-tight text-charcoal-ink shadow-none backdrop-blur transition-colors hover:bg-charcoal-ink hover:text-warm-off-white"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();

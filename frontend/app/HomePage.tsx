@@ -1,27 +1,30 @@
 "use client";
 
-import HeroSection from "@/components/home/HeroSection";
-import FeaturedCollections from "@/components/home/FeaturedCollections";
+import dynamic from "next/dynamic";
+import Hero from "@/components/home/Hero";
+import Categories from "@/components/home/Categories";
 import NewArrivals from "@/components/home/NewArrivals";
 import InstagramFeed from "@/components/home/InstagramFeed";
 import OnSaleStrip from "@/components/home/OnSaleStrip";
 import BestSellersStrip from "@/components/home/BestSellersStrip";
+import MonogramCustomizer from "@/components/customizer/MonogramCustomizer";
+
+const ScrollStationeryAnimation = dynamic(
+  () => import("@/components/home/ScrollStationeryAnimation"),
+  { ssr: false }
+);
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
-      <main>
-        {/* 1. Hero Banner */}
-        <HeroSection />
-        {/* 2. New Arrivals (early, freshness) */}
+    <div className="relative min-h-screen bg-warm-off-white">
+      <ScrollStationeryAnimation />
+      <main className="relative z-10">
+        <Hero />
+        <Categories />
         <NewArrivals />
-        {/* 3. Featured Collections (near top) */}
-        <FeaturedCollections />
-        {/* 4. On Sale (early) */}
+        <MonogramCustomizer />
         <OnSaleStrip />
-        {/* 5. Best Sellers (middle) */}
         <BestSellersStrip />
-        {/* Footer extras */}
         <InstagramFeed />
       </main>
     </div>

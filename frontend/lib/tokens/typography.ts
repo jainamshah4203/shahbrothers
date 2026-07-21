@@ -1,30 +1,31 @@
 export const typographyTokens = {
   fontFamily: {
-    sans: 'var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif',
-    serif: 'var(--font-playfair), "Playfair Display", Georgia, serif',
+    sans: 'var(--font-plus-jakarta), "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif',
+    serif: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
+    handwritten: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
   },
   hero: {
-    fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-    fontSize: 'clamp(3rem, 5vw + 1rem, 5rem)',
-    lineHeight: '1.1',
-    fontWeight: '700',
+    fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
+    fontSize: 'clamp(3rem, 5vw + 1rem, 5.5rem)',
+    lineHeight: '1.05',
+    fontWeight: '500',
     letterSpacing: '-0.02em',
   },
   sectionTitle: {
-    fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
+    fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
     fontSize: 'clamp(2rem, 3vw + 1rem, 3.5rem)',
-    lineHeight: '1.2',
-    fontWeight: '600',
+    lineHeight: '1.15',
+    fontWeight: '500',
     letterSpacing: '-0.01em',
   },
   subtitle: {
-    fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
+    fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
     fontSize: '1.5rem',
     lineHeight: '1.4',
     fontWeight: '500',
   },
   body: {
-    fontFamily: 'var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif',
+    fontFamily: 'var(--font-plus-jakarta), "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif',
     fontSize: '1rem',
     lineHeight: '1.65',
     fontWeight: '400',
@@ -46,6 +47,6 @@ export const typographyTokens = {
     lineHeight: '1.5',
     fontWeight: '400',
     letterSpacing: '-0.011em',
-    color: 'var(--color-warm-sepia)',
-  }
+    color: 'var(--color-muted-sepia)',
+  },
 } as const;

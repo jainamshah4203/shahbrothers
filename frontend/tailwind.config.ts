@@ -20,15 +20,15 @@ const config: Config = {
 		extend: {
 			fontFamily: {
 				sans: [
-					'var(--font-inter)',
-					'Inter',
+					'var(--font-plus-jakarta)',
+					'Plus Jakarta Sans',
 					'ui-sans-serif',
 					'system-ui',
 					'sans-serif',
 				],
 				serif: [
-					'var(--font-playfair)',
-					'Playfair Display',
+					'var(--font-cormorant)',
+					'Cormorant Garamond',
 					'Georgia',
 					'Times New Roman',
 					'serif',
@@ -78,7 +78,7 @@ const config: Config = {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Luxury stationery palette
+				// Luxury stationery palette — ban slate/zinc defaults in UI
 				'warm-off-white': '#FAF9F5',
 				cream: {
 					DEFAULT: '#F4F1EA',
@@ -89,6 +89,12 @@ const config: Config = {
 				linen: '#EFECE6',
 				'charcoal-ink': '#1A1A1A',
 				'warm-sepia': '#4A443F',
+				'muted-sepia': '#4A443F',
+				brass: '#D4AF37',
+				'gold-foil': '#D4AF37',
+				terracotta: '#C2593F',
+				'fountain-navy': '#1C2D42',
+				'silver-foil': '#C0C0C0',
 				'warm-white': {
 					50: '#FAF9F5',
 					100: '#F4F1EA',
@@ -148,14 +154,16 @@ const config: Config = {
 				'64': '256px',
 			},
 			boxShadow: {
-				'elevation-1': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-				'elevation-2': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-				'elevation-3': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-				floating: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-				glass: '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
-				premium: '0 30px 60px -12px rgba(50, 50, 93, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.3)',
-				inset: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
-				editorial: '0 10px 30px -5px rgba(26, 26, 26, 0.08)',
+				'elevation-1': '0 1px 3px 0 rgba(26, 26, 26, 0.04)',
+				'elevation-2': '0 4px 12px -2px rgba(26, 26, 26, 0.05)',
+				'elevation-3': '0 10px 30px -5px rgba(26, 26, 26, 0.06)',
+				floating: '0 20px 40px -10px rgba(26, 26, 26, 0.08)',
+				glass: '0 8px 32px 0 rgba(26, 26, 26, 0.06)',
+				premium: '0 24px 48px -12px rgba(26, 26, 26, 0.1)',
+				inset: 'inset 0 2px 4px 0 rgba(26, 26, 26, 0.04)',
+				editorial: '0 10px 30px -5px rgba(26, 26, 26, 0.06)',
+				paper: '0 10px 30px -5px rgba(26, 26, 26, 0.06)',
+				deboss: 'inset 0 1px 3px rgba(26, 26, 26, 0.08), inset 0 -1px 0 rgba(255, 255, 255, 0.4)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -168,8 +176,8 @@ const config: Config = {
 				'token-2xl': '1.5rem',
 			},
 			fontSize: {
-				'ds-hero': ['clamp(3rem, 5vw + 1rem, 5rem)', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
-				'ds-section': ['clamp(2rem, 3vw + 1rem, 3.5rem)', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '600' }],
+				'ds-hero': ['clamp(3rem, 5vw + 1rem, 5.5rem)', { lineHeight: '1.05', letterSpacing: '-0.02em', fontWeight: '500' }],
+				'ds-section': ['clamp(2rem, 3vw + 1rem, 3.5rem)', { lineHeight: '1.15', letterSpacing: '-0.01em', fontWeight: '500' }],
 				'ds-subtitle': ['1.5rem', { lineHeight: '1.4', fontWeight: '500' }],
 				'ds-body': ['1rem', { lineHeight: '1.65', letterSpacing: '-0.011em', fontWeight: '400' }],
 				'ds-product': ['1.125rem', { lineHeight: '1.5', fontWeight: '500' }],

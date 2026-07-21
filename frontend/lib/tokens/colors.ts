@@ -1,17 +1,24 @@
 export const colorTokens = {
-  // Luxury stationery surfaces
+  // Surfaces — paper canvas
   'warm-off-white': '#FAF9F5',
   cream: '#F4F1EA',
   linen: '#EFECE6',
 
-  // Legacy warm-white aliases (map onto stationery surfaces)
+  // Legacy warm-white aliases
   'warm-white-50': '#FAF9F5',
   'warm-white-100': '#F4F1EA',
   'warm-white-200': '#EFECE6',
 
   // Ink & sepia
   'charcoal-ink': '#1A1A1A',
+  'muted-sepia': '#4A443F',
   'warm-sepia': '#4A443F',
+
+  // Accents — foil & instrument
+  brass: '#D4AF37',
+  'gold-foil': '#D4AF37',
+  terracotta: '#C2593F',
+  'fountain-navy': '#1C2D42',
 
   // Soft Blacks
   'soft-black-900': '#1A1A1A',
@@ -25,12 +32,13 @@ export const colorTokens = {
   'wood-700': '#694121',
   'wood-900': '#3D220E',
 
-  // Brushed Aluminum
+  // Brushed Aluminum (silver foil)
   'aluminum-100': '#F2F2F2',
   'aluminum-300': '#D9D9D9',
   'aluminum-500': '#B3B3B3',
   'aluminum-700': '#808080',
   'aluminum-900': '#4D4D4D',
+  'silver-foil': '#C0C0C0',
 
   // Leather Brown
   'leather-100': '#F2DFD3',
@@ -39,10 +47,12 @@ export const colorTokens = {
   'leather-700': '#7F4016',
   'leather-900': '#4A2309',
 
-  // Warm Gray (aligned to stationery neutrals)
+  // Warm Gray (stationery neutrals — never use Tailwind slate/zinc)
   'warm-gray-100': '#F4F1EA',
   'warm-gray-300': '#D6D3D1',
   'warm-gray-500': '#A8A29E',
   'warm-gray-700': '#4A443F',
   'warm-gray-900': '#1A1A1A',
 } as const;
+
+export type ColorToken = keyof typeof colorTokens;
