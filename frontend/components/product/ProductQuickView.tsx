@@ -30,17 +30,25 @@ export function ProductQuickView({
 
   if (!product) return null;
 
-  const needSize = Array.isArray(product.sizes) && product.sizes.length > 0;
-  const needColor = Array.isArray(product.colors) && product.colors.length > 0;
+  const activeProduct = product;
+
+  const needSize = Array.isArray(activeProduct.sizes) && activeProduct.sizes.length > 0;
+  const needColor = Array.isArray(activeProduct.colors) && activeProduct.colors.length > 0;
   const canAdd = (!needSize || !!selectedSize) && (!needColor || !!selectedColor);
 
   function handleAddToCart() {
-    addToCart(
-      { ...product, sizes: product.sizes || [], colors: product.colors || [] },
-      { qty: 1, size: selectedSize || undefined, color: selectedColor || undefined }
-    );
+    const mapped: Product = {
+      ...activeProduct,
+      sizes: activeProduct.sizes || [],
+      colors: activeProduct.colors || [],
+    };
+    addToCart(mapped, {
+      qty: 1,
+      size: selectedSize || undefined,
+      color: selectedColor || undefined,
+    });
     setJustAdded(true);
-    toast({ title: "Added to cart", description: product.name });
+    toast({ title: "Added to cart", description: activeProduct.name });
     window.setTimeout(() => {
       onClose();
       setSelectedSize(null);

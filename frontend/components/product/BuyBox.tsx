@@ -62,6 +62,7 @@ export default function BuyBox({ product }: BuyBoxProps) {
     const mapped: Product = {
       id: product._id,
       name: product.name,
+      description: "",
       price: product.price,
       salePrice: product.salePrice,
       images: product.images,

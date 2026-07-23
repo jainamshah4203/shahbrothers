@@ -4,31 +4,31 @@ import dynamic from "next/dynamic";
 import Hero from "@/components/home/Hero";
 import Categories from "@/components/home/Categories";
 import NewArrivals from "@/components/home/NewArrivals";
-import { belowFoldDynamicOptions } from "@/lib/performance";
 
 const ScrollStationeryAnimation = dynamic(
   () => import("@/components/home/ScrollStationeryAnimation"),
   { ssr: false }
 );
 
+/* next/dynamic requires literal options objects (Turbopack) */
 const MonogramCustomizer = dynamic(
   () => import("@/components/customizer/MonogramCustomizer"),
-  belowFoldDynamicOptions
+  { ssr: true }
 );
 
 const OnSaleStrip = dynamic(
   () => import("@/components/home/OnSaleStrip"),
-  belowFoldDynamicOptions
+  { ssr: true }
 );
 
 const BestSellersStrip = dynamic(
   () => import("@/components/home/BestSellersStrip"),
-  belowFoldDynamicOptions
+  { ssr: true }
 );
 
 const InstagramFeed = dynamic(
   () => import("@/components/home/InstagramFeed"),
-  belowFoldDynamicOptions
+  { ssr: true }
 );
 
 /**
