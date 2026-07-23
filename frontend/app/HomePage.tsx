@@ -26,9 +26,11 @@ export default function HomePage() {
       <ScrollStationeryAnimation />
 
       <main className="relative z-[1]">
+        {/* Full-bleed hero outside the padded product column */}
+        <Hero />
+
         {/* Inner column keeps product UI clear of side pans on wide screens */}
         <div className="mx-auto w-full max-w-[1600px] md:px-[min(12vw,148px)]">
-          <Hero />
           <Categories />
           <NewArrivals />
           <MonogramCustomizer />
