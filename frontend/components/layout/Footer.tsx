@@ -44,7 +44,7 @@ export const Footer: React.FC = () => {
           <div className="lg:col-span-6">
             <Link
               href="/"
-              className="mb-5 inline-flex items-center gap-3 font-serif text-3xl font-medium tracking-tight text-charcoal-ink focus-ring"
+              className="mb-5 inline-flex items-center gap-3 font-serif text-3xl font-medium tracking-tight text-charcoal-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
             >
               <Image
                 src="/logo.png"
@@ -87,11 +87,11 @@ export const Footer: React.FC = () => {
                     setSubmitted(false);
                   }}
                   placeholder="your@email.com"
-                  className="flex-1 bg-transparent font-sans text-sm tracking-tight text-charcoal-ink placeholder:text-muted-sepia/60 focus:outline-none"
+                  className="flex-1 rounded-md bg-cream/60 px-2 py-1.5 font-sans text-sm tracking-tight text-charcoal-ink placeholder:text-muted-sepia/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass"
                 />
                 <button
                   type="submit"
-                  className="shrink-0 rounded-full bg-charcoal-ink px-5 py-2.5 font-sans text-sm text-warm-off-white transition-colors hover:bg-fountain-navy focus-ring"
+                  className="shrink-0 rounded-full bg-charcoal-ink px-5 py-2.5 font-sans text-sm text-warm-off-white transition-colors hover:bg-fountain-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass focus-visible:ring-offset-2 focus-visible:ring-offset-warm-off-white"
                 >
                   {submitted ? "Sealed" : "Send"}
                 </button>
@@ -155,7 +155,7 @@ export const Footer: React.FC = () => {
                 key={label}
                 href={href}
                 aria-label={label}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-muted-sepia transition-colors hover:bg-linen hover:text-charcoal-ink focus-ring"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-muted-sepia transition-colors hover:bg-linen hover:text-charcoal-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
               >
                 <Icon className="h-4 w-4" />
               </Link>

@@ -12,6 +12,7 @@ import { useWishlistStore, type WishlistState } from "@/store/wishlist";
 import { useUIStore } from "@/store/ui";
 import { useAuthStore } from "@/store/auth";
 import { cn } from "@/lib/utils";
+import { framerTransition } from "@/lib/animations";
 
 const NAV_ITEMS = [
   { label: "New Arrivals", href: "/new-arrivals" },
@@ -87,7 +88,9 @@ export const Navbar: React.FC = () => {
     <header
       className={cn(
         "sticky top-0 z-50 transition-[background,box-shadow,backdrop-filter] duration-500",
-        scrolled ? "glass-nav" : "bg-warm-off-white/40 backdrop-blur-md"
+        scrolled
+          ? "glass-nav shadow-paper"
+          : "bg-warm-off-white/40 backdrop-blur-md"
       )}
     >
       <div className="container mx-auto px-4">
@@ -98,7 +101,7 @@ export const Navbar: React.FC = () => {
               <SheetTrigger asChild>
                 <button
                   type="button"
-                  className="flex h-10 w-10 items-center justify-center rounded-full text-charcoal-ink transition-colors hover:bg-linen focus-ring"
+                  className="flex h-10 w-10 items-center justify-center rounded-full text-charcoal-ink transition-colors hover:bg-linen focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass focus-visible:ring-offset-2 focus-visible:ring-offset-warm-off-white"
                   aria-label="Open menu"
                 >
                   <Menu className="h-5 w-5" />
@@ -139,7 +142,7 @@ export const Navbar: React.FC = () => {
           {/* Brand */}
           <Link
             href="/"
-            className="group flex items-center gap-2.5 focus-ring rounded-sm"
+            className="group flex items-center gap-2.5 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass focus-visible:ring-offset-2 focus-visible:ring-offset-warm-off-white"
             aria-label="Shah Brothers home"
           >
             <Image
@@ -189,7 +192,7 @@ export const Navbar: React.FC = () => {
             <button
               type="button"
               onClick={() => setSearchOpen((v) => !v)}
-              className="hidden h-10 w-10 items-center justify-center rounded-full text-charcoal-ink transition-colors hover:bg-linen focus-ring sm:flex"
+              className="hidden h-10 w-10 items-center justify-center rounded-full text-charcoal-ink transition-colors hover:bg-linen focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass focus-visible:ring-offset-2 focus-visible:ring-offset-warm-off-white sm:flex"
               aria-label={searchOpen ? "Close search" : "Open search"}
               aria-expanded={searchOpen}
             >
@@ -203,7 +206,7 @@ export const Navbar: React.FC = () => {
             {!mounted || !isAuthed ? (
               <Link
                 href="/auth/login"
-                className="hidden h-10 w-10 items-center justify-center rounded-full text-charcoal-ink transition-colors hover:bg-linen focus-ring sm:flex"
+                className="hidden h-10 w-10 items-center justify-center rounded-full text-charcoal-ink transition-colors hover:bg-linen focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass focus-visible:ring-offset-2 focus-visible:ring-offset-warm-off-white sm:flex"
                 aria-label="Account"
               >
                 <User className="h-[18px] w-[18px]" />
@@ -212,9 +215,10 @@ export const Navbar: React.FC = () => {
               <div className="relative hidden sm:block">
                 <button
                   type="button"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-fountain-navy font-sans text-[0.65rem] font-medium tracking-wide text-warm-off-white focus-ring"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-fountain-navy font-sans text-[0.65rem] font-medium tracking-wide text-warm-off-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass focus-visible:ring-offset-2 focus-visible:ring-offset-warm-off-white"
                   title={authUser?.name || authUser?.email}
                   aria-expanded={profileOpen}
+                  aria-haspopup="menu"
                   onClick={() => setProfileOpen((v) => !v)}
                 >
                   {(authUser?.name || authUser?.email || "U")
@@ -227,7 +231,9 @@ export const Navbar: React.FC = () => {
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 6 }}
-                      className="absolute right-0 top-11 z-50 w-48 overflow-hidden rounded-md bg-warm-off-white shadow-paper"
+                      transition={framerTransition("fast")}
+                      role="menu"
+                      className="absolute right-0 top-11 z-50 w-48 overflow-hidden rounded-md border border-charcoal-ink/8 bg-warm-off-white shadow-paper glass-panel"
                     >
                       <div className="py-1 font-sans text-sm text-charcoal-ink">
                         <Link
@@ -267,7 +273,7 @@ export const Navbar: React.FC = () => {
 
             <Link
               href="/wishlist"
-              className="relative hidden h-10 w-10 items-center justify-center rounded-full text-charcoal-ink transition-colors hover:bg-linen focus-ring sm:flex"
+              className="relative hidden h-10 w-10 items-center justify-center rounded-full text-charcoal-ink transition-colors hover:bg-linen focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass focus-visible:ring-offset-2 focus-visible:ring-offset-warm-off-white sm:flex"
               aria-label={`Wishlist${mounted && wishlistCount > 0 ? `, ${wishlistCount} items` : ""}`}
             >
               <Heart className="h-[18px] w-[18px]" />
@@ -281,7 +287,7 @@ export const Navbar: React.FC = () => {
             <button
               type="button"
               onClick={openMiniCart}
-              className="relative flex h-10 w-10 items-center justify-center rounded-full text-charcoal-ink transition-colors hover:bg-linen focus-ring"
+              className="relative flex h-10 w-10 items-center justify-center rounded-full text-charcoal-ink transition-colors hover:bg-linen focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass focus-visible:ring-offset-2 focus-visible:ring-offset-warm-off-white"
               aria-label={`Cart${mounted && cartCount > 0 ? `, ${cartCount} items` : ""}`}
             >
               <Package className="h-[18px] w-[18px]" strokeWidth={1.6} />
@@ -300,7 +306,7 @@ export const Navbar: React.FC = () => {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              transition={framerTransition("fast")}
               className="overflow-hidden"
             >
               <form
@@ -318,11 +324,11 @@ export const Navbar: React.FC = () => {
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search pens, notebooks, foil…"
                   autoFocus
-                  className="w-full rounded-full border border-charcoal-ink/15 bg-cream/80 px-5 py-2.5 font-sans text-sm tracking-tight text-charcoal-ink placeholder:text-muted-sepia/70 focus:border-brass focus:outline-none focus:ring-1 focus:ring-brass"
+                  className="w-full rounded-full border border-charcoal-ink/15 bg-cream/80 px-5 py-2.5 font-sans text-sm tracking-tight text-charcoal-ink placeholder:text-muted-sepia/70 focus-visible:border-brass focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass"
                 />
                 <button
                   type="submit"
-                  className="shrink-0 rounded-full bg-charcoal-ink px-5 py-2.5 font-sans text-sm text-warm-off-white transition-colors hover:bg-fountain-navy focus-ring"
+                  className="shrink-0 rounded-full bg-charcoal-ink px-5 py-2.5 font-sans text-sm text-warm-off-white transition-colors hover:bg-fountain-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass focus-visible:ring-offset-2 focus-visible:ring-offset-warm-off-white"
                 >
                   Search
                 </button>

@@ -1,7 +1,8 @@
 "use client";
 
-import React, { cloneElement, ReactElement } from "react";
+import React, { cloneElement, ReactElement, Ref } from "react";
 import { useMagneticEffect } from "@/hooks/useMagneticEffect";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 interface MagneticButtonProps {
   children: ReactElement;
@@ -11,19 +12,37 @@ interface MagneticButtonProps {
   radius?: number;
 }
 
-/**
- * Wrapper component that applies a magnetic hover effect to its child.
- * The child must be a valid React Element that accepts a ref.
- */
-export default function MagneticButton({ 
-  children, 
-  strength = 0.3, 
-  radius = 100 
-}: MagneticButtonProps) {
-  const magneticRef = useMagneticEffect<HTMLElement>({ strength, radius });
+function assignRef<T>(ref: Ref<T> | undefined, value: T | null) {
+  if (!ref) return;
+  if (typeof ref === "function") {
+    ref(value);
+    return;
+  }
+  (ref as React.MutableRefObject<T | null>).current = value;
+}
 
-  // Clone the child to inject the ref transparently
+/**
+ * Wrapper that applies magnetic hover to its child.
+ * Magnetic motion is disabled automatically when `prefers-reduced-motion` is set
+ * (via `useMagneticEffect` / `useReducedMotion`).
+ */
+export default function MagneticButton({
+  children,
+  strength = 0.3,
+  radius = 100,
+}: MagneticButtonProps) {
+  const prefersReduced = useReducedMotion();
+  const magneticRef = useMagneticEffect<HTMLElement>({ strength, radius });
+  const childRef = (children as ReactElement & { ref?: Ref<HTMLElement> }).ref;
+
+  if (prefersReduced) {
+    return children;
+  }
+
   return cloneElement(children, {
-    ref: magneticRef,
-  });
+    ref: (node: HTMLElement | null) => {
+      assignRef(magneticRef, node);
+      assignRef(childRef, node);
+    },
+  } as Partial<typeof children.props>);
 }

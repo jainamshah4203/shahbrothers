@@ -4,18 +4,20 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-3 py-1 text-ds-caption font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover:scale-[1.02]",
+  "inline-flex items-center rounded-full border px-3 py-1 text-ds-caption font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-brass focus:ring-offset-2 focus:ring-offset-warm-off-white",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground shadow-elevation-1 hover:bg-primary/90 hover:shadow-elevation-2",
+          "border-transparent bg-charcoal-ink text-warm-off-white shadow-paper hover:bg-fountain-navy",
         secondary:
-          "border-transparent bg-secondary text-secondary-foreground shadow-elevation-1 hover:bg-secondary/80 hover:shadow-elevation-2",
+          "border-transparent bg-cream text-charcoal-ink shadow-paper hover:bg-linen",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow-elevation-1 hover:bg-destructive/80 hover:shadow-elevation-2",
-        outline: "text-foreground hover:bg-accent/50",
-        glass: "border-white/20 glass text-foreground shadow-glass hover:bg-white/20",
+          "border-transparent bg-terracotta text-warm-off-white shadow-paper hover:bg-terracotta/90",
+        outline:
+          "border-charcoal-ink/20 bg-warm-off-white text-charcoal-ink hover:bg-linen",
+        glass:
+          "border-charcoal-ink/10 glass-panel text-charcoal-ink shadow-paper",
       },
     },
     defaultVariants: {
