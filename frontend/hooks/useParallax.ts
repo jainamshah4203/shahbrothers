@@ -28,7 +28,7 @@ export function useParallax<T extends HTMLElement = HTMLDivElement>(
   options: ParallaxOptions = {}
 ) {
   const ref = useRef<T>(null);
-  const mousePosRef = useMousePosition(0.05); // Smooth interpolation
+  const mousePosRef = useMousePosition();
   const prefersReduced = useReducedMotion();
   const { tier, isMobile } = useDeviceCapability();
 
@@ -36,10 +36,9 @@ export function useParallax<T extends HTMLElement = HTMLDivElement>(
 
   useEffect(() => {
     const el = ref.current;
-    
-    // Disable on mobile, low-tier devices, or if reduced motion is requested
+
     if (!el || prefersReduced || isMobile || tier === "low") {
-       return;
+      return;
     }
 
     let xTo: gsap.QuickToFunc | undefined;
@@ -47,14 +46,12 @@ export function useParallax<T extends HTMLElement = HTMLDivElement>(
 
     const mm = gsap.matchMedia();
     mm.add("(min-width: 768px)", () => {
-      // Create quickTo functions for optimal performance using fast motion token
-      xTo = gsap.quickTo(el, "x", motionTokens.fast);
-      yTo = gsap.quickTo(el, "y", motionTokens.fast);
+      xTo = gsap.quickTo(el, "x", motionTokens.fast.gsap);
+      yTo = gsap.quickTo(el, "y", motionTokens.fast.gsap);
     });
-    
+
     const direction = invert ? -1 : 1;
-    
-    // Animate via GSAP ticker so we don't cause React re-renders
+
     const tick = () => {
       if (xTo && yTo) {
         xTo(mousePosRef.current.normalizedX * depth * direction);

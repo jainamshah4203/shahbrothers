@@ -4,7 +4,11 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "./useReducedMotion";
-import { motionTokens } from "../lib/animations";
+import {
+  motionTokens,
+  type DurationTokenName,
+  type MotionTokenName,
+} from "../lib/animations";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -24,7 +28,7 @@ interface RevealOptions {
   /** Delay before animation starts (seconds). Default: 0 */
   delay?: number;
   /** Animation token to use. Default: "slow" */
-  token?: keyof typeof motionTokens;
+  token?: MotionTokenName;
   /** ScrollTrigger start position. Default: "top 85%" */
   start?: string;
   /** Whether the animation should replay when scrolling back. Default: false */
@@ -45,6 +49,7 @@ const PRESET_FROM: Record<RevealPreset, gsap.TweenVars> = {
  * Attach the returned ref to any element. When it enters the
  * viewport, it will animate in using the chosen preset.
  * Respects `prefers-reduced-motion` — shows instantly if set.
+ * Timings always come from `motionTokens`.
  *
  * @param options - Animation configuration.
  * @returns A ref to attach to the target element.
@@ -68,22 +73,21 @@ export function useRevealAnimation<T extends HTMLElement = HTMLDivElement>(
     if (!el || prefersReduced) return;
 
     const fromVars = PRESET_FROM[preset];
-    
-    // We ignore duration/ease if the token is "scroll" since scrub handles it
-    const tokenProps = motionTokens[token];
     const isScrollToken = token === "scroll";
+    const durationToken = (isScrollToken ? "slow" : token) as DurationTokenName;
+    const timing = motionTokens[durationToken].gsap;
 
     const mm = gsap.matchMedia();
     mm.add("(min-width: 768px)", () => {
       gsap.from(el, {
         ...fromVars,
-        ...(isScrollToken ? {} : tokenProps),
+        ...(isScrollToken ? {} : timing),
         delay,
         scrollTrigger: {
           trigger: el,
           start,
           toggleActions,
-          ...(isScrollToken ? tokenProps : {}),
+          ...(isScrollToken ? motionTokens.scroll.gsap : {}),
         },
       });
     });

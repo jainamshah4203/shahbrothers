@@ -17,6 +17,7 @@ interface TiltOptions {
 
 /**
  * Creates a 3D tilt effect on hover based on mouse position.
+ * Timings from `motionTokens.fast`.
  *
  * @param options - Configuration for max angle, perspective, and scale.
  * @returns A ref to attach to the target element.
@@ -32,8 +33,7 @@ export function useTiltEffect<T extends HTMLElement = HTMLDivElement>(
 
   useEffect(() => {
     const el = ref.current;
-    
-    // Disable on mobile, low-tier devices, or if reduced motion is requested
+
     if (!el || prefersReduced || isMobile || tier === "low") return;
 
     let xTo: gsap.QuickToFunc | undefined;
@@ -43,20 +43,18 @@ export function useTiltEffect<T extends HTMLElement = HTMLDivElement>(
     const mm = gsap.matchMedia();
     mm.add("(min-width: 768px)", () => {
       gsap.set(el, { transformPerspective: perspective });
-      
-      xTo = gsap.quickTo(el, "rotationY", motionTokens.fast);
-      yTo = gsap.quickTo(el, "rotationX", motionTokens.fast);
-      scaleTo = gsap.quickTo(el, "scale", motionTokens.fast);
+
+      xTo = gsap.quickTo(el, "rotationY", motionTokens.fast.gsap);
+      yTo = gsap.quickTo(el, "rotationX", motionTokens.fast.gsap);
+      scaleTo = gsap.quickTo(el, "scale", motionTokens.fast.gsap);
     });
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = el.getBoundingClientRect();
-      
-      // Calculate normalized mouse position relative to element center (-1 to 1)
+
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      
-      // Rotate based on mouse position
+
       xTo?.(x * maxAngle * 2);
       yTo?.(-y * maxAngle * 2);
     };

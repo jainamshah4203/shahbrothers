@@ -14,6 +14,7 @@ interface MagneticOptions {
 
 /**
  * Creates a magnetic hover effect where the element is pulled towards the mouse pointer.
+ * Uses `motionTokens.hover` (elastic micro-delight — intentional exception to soft springs).
  *
  * @param options - Configuration options for strength and activation radius.
  * @returns A ref to attach to the target element.
@@ -32,33 +33,29 @@ export function useMagneticEffect<T extends HTMLElement = HTMLDivElement>(
 
     let xTo: gsap.QuickToFunc | undefined;
     let yTo: gsap.QuickToFunc | undefined;
-    
-    // Using gsap.context for easy cleanup
+
     const ctx = gsap.context(() => {
-      xTo = gsap.quickTo(el, "x", motionTokens.hover);
-      yTo = gsap.quickTo(el, "y", motionTokens.hover);
+      xTo = gsap.quickTo(el, "x", motionTokens.hover.gsap);
+      yTo = gsap.quickTo(el, "y", motionTokens.hover.gsap);
     });
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = el.getBoundingClientRect();
       const hWidth = rect.width / 2;
       const hHeight = rect.height / 2;
-      
+
       const centerX = rect.left + hWidth;
       const centerY = rect.top + hHeight;
-      
+
       const distX = e.clientX - centerX;
       const distY = e.clientY - centerY;
-      
-      // Check if mouse is within the activation radius
+
       const distance = Math.sqrt(distX * distX + distY * distY);
-      
+
       if (distance < radius) {
-        // Apply magnetic pull
         xTo?.(distX * strength);
         yTo?.(distY * strength);
       } else {
-        // Reset position
         xTo?.(0);
         yTo?.(0);
       }
