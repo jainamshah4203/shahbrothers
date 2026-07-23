@@ -1,38 +1,58 @@
-# Code Quality Report — Shah Brothers Frontend
+# Code Quality Report — Frontend Dead Code Pass
 
 **Date:** 2026-07-23  
-**Scope:** Dead-path cleanup after Wave 1–3 orchestration  
+**Agent:** Code Quality  
+**Workspace:** `frontend/`
 
-## Removals
+## Summary
 
-| Path | Reason |
-|------|--------|
-| `components/home/HeroSection.tsx` | Orphaned editorial flatlay hero. Homepage uses `Hero.tsx` → `Hero3D`. Zero imports after Wave 2. |
-| `components/home/FeaturedCollections.tsx` | Duplicate of Categories masonry pattern; not composed in `HomePage.tsx`; zero imports. |
+Homepage already mounts a single hero via `@/components/home/Hero` → `Hero3D`. Legacy alternate paths were verified unused and removed (or documented when ownership forbids deletion).
 
-## Kept (documented)
+## Grep results
 
-| Path | Reason |
-|------|--------|
-| `components/home/Hero3DCanvas.tsx` | Thin re-export of `Hero3D` for backward-compatible imports — keep. |
-| `components/stationery-3d/*` | Used by PDP `Product3DPreview` — keep. |
-| `components/layout/Header.tsx` | Re-exports `Navbar` — keep for compatibility. |
+| Symbol / path | Code imports (`.ts`/`.tsx`/`.js`/`.mjs`) | Status |
+|---|---|---|
+| `HeroSection` / `components/home/HeroSection.tsx` | None (smoke-check + QA docs only warn against it) | **Removed** — file deleted; was unimported |
+| `FeaturedCollections` / `components/home/FeaturedCollections.tsx` | None (stale mention in `docs/a11y-audit.md` only) | **Removed** — file deleted; was unimported |
+| `Hero3DCanvas` / `components/home/Hero3DCanvas.tsx` | None | **Kept** — thin re-export of `@/components/Hero3D/Hero3D`; ownership allows edit only if broken. Re-export is valid; not deleted |
 
-## Files >250 lines (note only — owned by other agents)
+### Homepage hero path (current)
 
-- `components/home/ScrollStationeryAnimation.tsx`
-- `components/cart/CartDrawer.tsx`
-- `components/Hero3D/DeskScene.tsx` (likely)
-- `components/product/ProductCard.tsx`
+`app/HomePage.tsx` imports `@/components/home/Hero` only. No dual-hero risk from `HeroSection`.
 
-Recommend future splits when those owners next touch the files.
+## Actions taken
 
-## TypeScript / lint
+1. Confirmed `HeroSection.tsx` and `FeaturedCollections.tsx` had no runtime consumers.
+2. Staged deletion of both files (already deleted in the working tree).
+3. Left `Hero3DCanvas.tsx` unchanged (working re-export; unused but intentional compatibility shim).
+4. Did not touch out-of-ownership modules (`lib/animations.ts`, tokens, ProductCard, Categories, Hero3D Scene/DeskScene, ui/button, product Gallery/BuyBox).
 
-- Prefer `tsc --noEmit` + `next build` as merge gates.
-- Motion API: use `motionTokens.*.gsap` / `.framer` — do not spread raw tokens into GSAP.
+## Files >250 lines (note only — outside ownership)
 
-## Token enforcement
+| Lines | Path |
+|------:|------|
+| 708 | `components/ui/sidebar.tsx` |
+| 629 | `components/home/ScrollStationeryAnimation.tsx` |
+| 386 | `components/orders/OrderDetailsPage.tsx` |
+| 369 | `components/collections/CollectionsClient.tsx` |
+| 358 | `components/cart/CartDrawer.tsx` |
+| 328 | `components/ui/chart.tsx` |
+| 325 | `components/layout/Navbar.tsx` |
+| 283 | `lib/animations.ts` *(do not touch)* |
+| 267 | `components/Hero3D/DeskScene.tsx` *(do not touch)* |
+| 260 | `components/product/Reviews.tsx` |
 
-- Design tokens live in `lib/tokens` + Tailwind; materials in `lib/materials.ts`.
-- Ban new `slate-*` / `zinc-*` / `gray-*` utilities in UI work.
+## TypeScript check
+
+`npx tsc --noEmit -p tsconfig.json` reported errors **outside** this agent’s ownership (not fixed here):
+
+- `components/product/BuyBox.tsx` — missing `description` on `Product`
+- `components/product/ProductQuickView.tsx` — incomplete/`null` product typing
+
+No new TS errors introduced by this pass. No `any` fixes required in owned edits (report-only + deletions).
+
+## Follow-ups (optional)
+
+- Remove or update stale doc references to `FeaturedCollections` / `HeroSection` in `docs/a11y-audit.md` and `docs/manual-qa-checklist.md` once those docs are owned.
+- Consider deleting `Hero3DCanvas.tsx` in a later cleanup if the team no longer wants the compatibility shim (currently unused).
+- Split files >250 lines listed above under their respective owners.
