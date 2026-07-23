@@ -4,12 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart } from "lucide-react";
+import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types/product";
 import { formatINR } from "@/lib/formatCurrency";
+import { framerTransition } from "@/lib/animations";
 import { useTiltEffect } from "@/hooks/useTiltEffect";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useWishlistStore } from "@/store/wishlist";
 
 interface ProductCardProps {
@@ -56,12 +59,17 @@ const ProductCard = ({
 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const prefersReduced = useReducedMotion();
 
-  const tiltRef = useTiltEffect<HTMLDivElement>({ scale: 1.02 });
+  const tiltRef = useTiltEffect<HTMLDivElement>({
+    scale: 1.02,
+    maxAngle: 8,
+  });
   const wishlist = useWishlistStore((s: any) => s);
   const isWishlisted = wishlist?.items?.some((id: string) => id === product.id);
 
-  const toggleWishlist = (e: React.MouseEvent) => {
+  const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (onAddToWishlist) {
@@ -70,6 +78,12 @@ const ProductCard = ({
       if (isWishlisted) wishlist.removeItem(product.id);
       else wishlist.addItem(product.id);
     }
+  };
+
+  const handleQuickView = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onQuickView?.(product);
   };
 
   const handleImageHover = () => {
@@ -93,11 +107,16 @@ const ProductCard = ({
   const stationeryTag = getStationeryTag(product);
 
   return (
-    <div ref={tiltRef} className="h-full">
+    <div ref={tiltRef} className="h-full [transform-style:preserve-3d]">
       <Card
         className="product-card group relative flex h-full flex-col overflow-hidden border-none bg-cream shadow-deboss transition-[box-shadow,transform] duration-500 ease-out hover:-translate-y-1.5 hover:shadow-paper"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        style={{
+          boxShadow: isHovered
+            ? "0 18px 40px -8px rgba(26, 26, 26, 0.12), 0 6px 14px -4px rgba(26, 26, 26, 0.06)"
+            : undefined,
+        }}
       >
         {/* Paper grain texture */}
         <div
@@ -109,19 +128,40 @@ const ProductCard = ({
         {/* Product Image */}
         <div className="relative mb-4 overflow-hidden rounded-token-md bg-linen">
           <Link href={`/products/${slug}`} className="relative block aspect-[3/4]">
-            <Image
-              src={product.images[currentImageIndex] || "/placeholder.svg"}
-              alt={product.name}
-              fill
-              sizes="(min-width:1024px) 25vw, (min-width:640px) 33vw, 100vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-              onMouseEnter={handleImageHover}
-              onMouseLeave={handleImageLeave}
-              priority={false}
-            />
+            {/* Skeleton placeholder until image loads */}
+            {!imageLoaded && (
+              <div
+                className="absolute inset-0 animate-pulse bg-cream"
+                aria-hidden
+              />
+            )}
+            <motion.div
+              className="absolute inset-0"
+              animate={
+                prefersReduced
+                  ? undefined
+                  : { y: isHovered ? -6 : 0 }
+              }
+              transition={framerTransition("hover")}
+            >
+              <Image
+                src={product.images[currentImageIndex] || "/placeholder.svg"}
+                alt={product.name}
+                fill
+                sizes="(min-width:1024px) 25vw, (min-width:640px) 33vw, 100vw"
+                className={`object-cover transition-transform duration-700 ease-out ${
+                  imageLoaded ? "opacity-100" : "opacity-0"
+                } ${prefersReduced ? "" : "group-hover:scale-[1.04]"}`}
+                onMouseEnter={handleImageHover}
+                onMouseLeave={handleImageLeave}
+                onLoad={() => setImageLoaded(true)}
+                loading="lazy"
+                priority={false}
+              />
+            </motion.div>
           </Link>
 
-          {/* Stationery attribute badge — top corner */}
+          {/* Stationery attribute badge — GSM / binding */}
           {stationeryTag && (
             <span className="absolute left-3 top-3 z-[2] border border-charcoal-ink/15 bg-warm-off-white/90 px-2.5 py-1 font-sans text-[0.65rem] font-medium uppercase tracking-[0.14em] text-charcoal-ink backdrop-blur-sm">
               {stationeryTag}
@@ -146,12 +186,12 @@ const ProductCard = ({
               </Badge>
             )}
             {isLimited && (
-              <Badge variant="outline" className="bg-background/90">
+              <Badge variant="outline" className="bg-warm-off-white/90">
                 LIMITED
               </Badge>
             )}
             {!product.inStock && (
-              <Badge variant="outline" className="bg-background/90">
+              <Badge variant="outline" className="bg-warm-off-white/90">
                 OUT OF STOCK
               </Badge>
             )}
@@ -166,27 +206,24 @@ const ProductCard = ({
             <Button
               size="icon"
               variant="secondary"
+              aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
               className={`h-10 w-10 rounded-full shadow-elevation-1 transition-colors ${
                 isWishlisted
-                  ? "bg-red-50 text-red-500 hover:bg-red-100"
-                  : "bg-warm-white-50 text-soft-black-900 hover:bg-warm-gray-100"
+                  ? "bg-terracotta/10 text-terracotta hover:bg-terracotta/20"
+                  : "bg-warm-off-white text-charcoal-ink hover:bg-cream"
               }`}
-              onClick={toggleWishlist}
+              onClick={handleToggleWishlist}
             >
               <Heart className={`h-4 w-4 ${isWishlisted ? "fill-current" : ""}`} />
             </Button>
           </div>
 
-          {/* Quick View */}
-          <div className="absolute inset-x-0 bottom-0 z-[2] translate-y-4 p-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          {/* Quick View trigger */}
+          <div className="absolute inset-x-0 bottom-0 z-[2] translate-y-4 p-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 focus-within:translate-y-0 focus-within:opacity-100">
             <Button
               variant="secondary"
               className="w-full rounded-full border border-charcoal-ink/20 bg-warm-off-white/90 font-sans text-sm tracking-tight text-charcoal-ink shadow-none backdrop-blur transition-colors hover:bg-charcoal-ink hover:text-warm-off-white"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onQuickView?.(product);
-              }}
+              onClick={handleQuickView}
             >
               Quick View
             </Button>
@@ -200,7 +237,7 @@ const ProductCard = ({
           </div>
 
           <Link href={`/products/${slug}`}>
-            <h3 className="line-clamp-2 font-medium text-ds-product text-charcoal-ink transition-colors hover:text-wood-700">
+            <h3 className="line-clamp-2 font-medium text-ds-product text-charcoal-ink transition-colors hover:text-fountain-navy">
               {product.name}
             </h3>
           </Link>

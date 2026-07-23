@@ -4,6 +4,7 @@ import React from "react";
 import ProductCard from "@/components/product/ProductCard";
 import type { Product } from "@/types/product";
 import { cn } from "@/lib/utils";
+import { useScrollAnim } from "@/hooks/useScrollAnim";
 
 interface ProductGridProps {
   products: Product[];
@@ -11,6 +12,27 @@ interface ProductGridProps {
   onAddToWishlist?: (productId: string) => void;
   className?: string;
   columns?: 2 | 3 | 4;
+}
+
+function GridItem({
+  children,
+  index,
+}: {
+  children: React.ReactNode;
+  index: number;
+}) {
+  const revealRef = useScrollAnim<HTMLDivElement>({
+    mode: "reveal",
+    preset: "fadeUp",
+    token: "slow",
+    delay: Math.min(index, 8) * 0.06,
+  });
+
+  return (
+    <div ref={revealRef} role="listitem">
+      {children}
+    </div>
+  );
 }
 
 /**
@@ -35,14 +57,14 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
       className={cn("grid grid-cols-1 gap-6 md:gap-8", colClass, className)}
       role="list"
     >
-      {products.map((product) => (
-        <div key={product.id} role="listitem">
+      {products.map((product, index) => (
+        <GridItem key={product.id} index={index}>
           <ProductCard
             product={product}
             onQuickView={onQuickView}
             onAddToWishlist={onAddToWishlist}
           />
-        </div>
+        </GridItem>
       ))}
     </div>
   );
