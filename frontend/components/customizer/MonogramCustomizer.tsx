@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useId, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -31,6 +31,8 @@ export const MonogramCustomizer: React.FC<MonogramCustomizerProps> = ({
   coverImage = DEFAULT_COVER,
   onChange,
 }) => {
+  const finishLegendId = useId();
+  const previewLiveId = useId();
   const [initials, setInitials] = useState("SB");
   const [finish, setFinish] = useState<FoilFinish>("gold");
 
@@ -38,6 +40,16 @@ export const MonogramCustomizer: React.FC<MonogramCustomizerProps> = ({
     () => initials.toUpperCase().slice(0, 3) || "·",
     [initials]
   );
+
+  const finishLabel = useMemo(
+    () => FINISHES.find((f) => f.id === finish)?.label ?? finish,
+    [finish]
+  );
+
+  const previewAnnouncement = useMemo(() => {
+    const letters = display === "·" ? "no initials" : display;
+    return `Monogram preview: ${letters}, ${finishLabel}`;
+  }, [display, finishLabel]);
 
   const handleInitialsChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,6 +69,43 @@ export const MonogramCustomizer: React.FC<MonogramCustomizerProps> = ({
       onChange?.({ initials, finish: next });
     },
     [initials, onChange]
+  );
+
+  const handleFinishKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      const keys = [
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowUp",
+        "ArrowDown",
+        "Home",
+        "End",
+      ];
+      if (!keys.includes(e.key)) return;
+
+      e.preventDefault();
+      const idx = FINISHES.findIndex((f) => f.id === finish);
+      let nextIdx = idx;
+
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        nextIdx = (idx + 1) % FINISHES.length;
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        nextIdx = (idx - 1 + FINISHES.length) % FINISHES.length;
+      } else if (e.key === "Home") {
+        nextIdx = 0;
+      } else if (e.key === "End") {
+        nextIdx = FINISHES.length - 1;
+      }
+
+      const nextFinish = FINISHES[nextIdx];
+      handleFinishChange(nextFinish.id);
+
+      const radios = e.currentTarget.querySelectorAll<HTMLElement>(
+        '[role="radio"]'
+      );
+      radios[nextIdx]?.focus();
+    },
+    [finish, handleFinishChange]
   );
 
   const foilClass =
@@ -108,50 +157,72 @@ export const MonogramCustomizer: React.FC<MonogramCustomizerProps> = ({
                   aria-describedby="monogram-hint"
                   className="w-full max-w-[200px] rounded-md border border-charcoal-ink/15 bg-warm-off-white px-4 py-3 font-serif text-2xl tracking-[0.2em] text-charcoal-ink focus:border-brass focus:outline-none focus:ring-1 focus:ring-brass"
                 />
-                <p id="monogram-hint" className="mt-2 font-sans text-xs text-muted-sepia">
+                <p
+                  id="monogram-hint"
+                  className="mt-2 font-sans text-xs text-muted-sepia"
+                >
                   Up to 3 letters
                 </p>
               </div>
 
               <fieldset>
-                <legend className="mb-3 font-sans text-xs font-medium uppercase tracking-[0.16em] text-muted-sepia">
+                <legend
+                  id={finishLegendId}
+                  className="mb-3 font-sans text-xs font-medium uppercase tracking-[0.16em] text-muted-sepia"
+                >
                   Finish
                 </legend>
-                <div className="flex flex-wrap gap-2" role="radiogroup">
-                  {FINISHES.map((f) => (
-                    <button
-                      key={f.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={finish === f.id}
-                      onClick={() => handleFinishChange(f.id)}
-                      className={cn(
-                        "rounded-full border px-4 py-2 font-sans text-sm tracking-tight transition-colors focus-ring",
-                        finish === f.id
-                          ? "border-charcoal-ink bg-charcoal-ink text-warm-off-white"
-                          : "border-charcoal-ink/25 bg-transparent text-charcoal-ink hover:border-charcoal-ink"
-                      )}
-                    >
-                      {f.label}
-                    </button>
-                  ))}
+                <div
+                  className="flex flex-wrap gap-2"
+                  role="radiogroup"
+                  aria-labelledby={finishLegendId}
+                  onKeyDown={handleFinishKeyDown}
+                >
+                  {FINISHES.map((f) => {
+                    const selected = finish === f.id;
+                    return (
+                      <button
+                        key={f.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        tabIndex={selected ? 0 : -1}
+                        onClick={() => handleFinishChange(f.id)}
+                        className={cn(
+                          "rounded-full border px-4 py-2 font-sans text-sm tracking-tight transition-colors focus-ring",
+                          selected
+                            ? "border-charcoal-ink bg-charcoal-ink text-warm-off-white"
+                            : "border-charcoal-ink/25 bg-transparent text-charcoal-ink hover:border-charcoal-ink"
+                        )}
+                      >
+                        {f.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </fieldset>
 
-              <Link href="/collections?q=foil" className="btn-outline-pill inline-flex">
+              <Link
+                href="/collections?q=foil"
+                className="btn-outline-pill inline-flex"
+              >
                 Browse foilable notebooks
               </Link>
             </div>
           </div>
 
           <div className="lg:col-span-7">
+            <p id={previewLiveId} className="sr-only" aria-live="polite" aria-atomic="true">
+              {previewAnnouncement}
+            </p>
             <motion.div
               className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-[2px] bg-linen shadow-paper debossed"
               layout
+              aria-hidden="true"
             >
               <Image
                 src={coverImage}
-                alt="Notebook cover preview"
+                alt=""
                 fill
                 className="object-cover"
                 sizes="(min-width:1024px) 40vw, 90vw"
@@ -164,7 +235,6 @@ export const MonogramCustomizer: React.FC<MonogramCustomizerProps> = ({
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 className="absolute inset-0 flex items-center justify-center"
-                aria-live="polite"
               >
                 <span
                   className={cn(

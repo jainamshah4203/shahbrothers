@@ -83,12 +83,20 @@ export default function RootLayout({
       <body
         className={`${plusJakarta.variable} ${cormorant.variable} font-sans antialiased tracking-tight bg-warm-off-white paper-grain`}
       >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-charcoal-ink focus:px-4 focus:py-2 focus:font-sans focus:text-sm focus:text-warm-off-white focus:outline-none focus:ring-2 focus:ring-brass focus:ring-offset-2 focus:ring-offset-warm-off-white"
+        >
+          Skip to main content
+        </a>
         <AnimatedCursor />
         <ClientProviders>
           <TooltipProvider>
             <div className="relative flex min-h-screen flex-col">
               <Navbar />
-              <div className="relative z-10 flex-1">{children}</div>
+              <div id="main-content" className="relative z-10 flex-1" tabIndex={-1}>
+                {children}
+              </div>
               <Footer />
             </div>
             <Toaster />

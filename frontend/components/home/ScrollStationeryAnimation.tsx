@@ -267,7 +267,8 @@ function StationeryGlyph({
           height={size * 0.28}
           viewBox="0 0 100 28"
           fill="none"
-          aria-hidden
+          aria-hidden="true"
+          focusable="false"
         >
           <rect x="8" y="10" width="62" height="8" rx="2" fill={color} />
           <path d="M70 10 L92 14 L70 18 Z" fill={stroke} />
@@ -282,7 +283,8 @@ function StationeryGlyph({
           height={size * 0.22}
           viewBox="0 0 100 22"
           fill="none"
-          aria-hidden
+          aria-hidden="true"
+          focusable="false"
         >
           <rect x="12" y="7" width="58" height="8" fill={color} />
           <path
@@ -326,7 +328,8 @@ function StationeryGlyph({
           height={size}
           viewBox="0 0 24 70"
           fill="none"
-          aria-hidden
+          aria-hidden="true"
+          focusable="false"
         >
           <rect x="5" y="12" width="14" height="48" rx="3" fill={color} />
           <path d="M5 12 L12 1.5 L19 12 Z" fill={color} />
@@ -358,7 +361,8 @@ function StationeryGlyph({
           height={size}
           viewBox="0 0 24 48"
           fill="none"
-          aria-hidden
+          aria-hidden="true"
+          focusable="false"
         >
           <path
             d="M8 6 C8 3 16 3 16 8 L16 32 C16 38 8 38 8 32 L8 14 C8 10 14 10 14 14 L14 28"
@@ -371,7 +375,14 @@ function StationeryGlyph({
       );
     case "seal":
       return (
-        <svg width={size} height={size} viewBox="0 0 48 48" fill="none" aria-hidden>
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 48 48"
+          fill="none"
+          aria-hidden="true"
+          focusable="false"
+        >
           <circle cx="24" cy="22" r="16" fill={color} />
           <circle
             cx="24"
@@ -397,7 +408,8 @@ function StationeryGlyph({
           height={size * 0.55}
           viewBox="0 0 48 26"
           fill="none"
-          aria-hidden
+          aria-hidden="true"
+          focusable="false"
         >
           <rect
             x="2"
@@ -567,7 +579,7 @@ const PhysicsItem: React.FC<PhysicsItemProps> = ({
         opacity: config.opacity,
         filter: "drop-shadow(0 10px 18px rgba(26,26,26,0.12))",
       }}
-      aria-hidden
+      aria-hidden="true"
     >
       <StationeryGlyph
         kind={config.kind}
@@ -594,7 +606,9 @@ export const ScrollStationeryAnimation: React.FC<
   return (
     <div
       className={`pointer-events-none fixed inset-0 z-[30] overflow-hidden ${className}`}
-      aria-hidden
+      aria-hidden="true"
+      role="presentation"
+      inert
     >
       {/* Desktop / tablet gutters — outside content column */}
       <div className="relative mx-auto hidden h-full w-full md:block">

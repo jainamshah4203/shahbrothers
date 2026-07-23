@@ -1,6 +1,13 @@
 "use client";
 
-import React, { useCallback, useEffect, useId, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -11,11 +18,18 @@ import { formatINR } from "@/lib/formatCurrency";
 
 const FREE_SHIPPING_THRESHOLD = 1500;
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 /**
  * Gift-wrapped cart slide-over — ink shipping progress + optional gift note.
  */
 export const CartDrawer: React.FC = () => {
   const titleId = useId();
+  const descId = useId();
+  const panelRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   const [mounted, setMounted] = useState(false);
   const [giftOpen, setGiftOpen] = useState(false);
   const [giftMessage, setGiftMessage] = useState("");
@@ -38,14 +52,68 @@ export const CartDrawer: React.FC = () => {
 
   useEffect(() => {
     if (!miniCartOpen) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeMiniCart();
+
+    previouslyFocusedRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+
+    const focusClose = window.requestAnimationFrame(() => {
+      closeButtonRef.current?.focus();
+    });
+
+    const getFocusable = (): HTMLElement[] => {
+      if (!panelRef.current) return [];
+      return Array.from(
+        panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      ).filter((el) => {
+        if (el.hasAttribute("disabled") || el.getAttribute("aria-hidden") === "true") {
+          return false;
+        }
+        return el.getClientRects().length > 0;
+      });
     };
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeMiniCart();
+        return;
+      }
+
+      if (e.key !== "Tab") return;
+
+      const focusable = getFocusable();
+      if (focusable.length === 0) {
+        e.preventDefault();
+        closeButtonRef.current?.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (e.shiftKey) {
+        if (active === first || !panelRef.current?.contains(active)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else if (active === last || !panelRef.current?.contains(active)) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
     document.addEventListener("keydown", handleKey);
     document.body.style.overflow = "hidden";
+
     return () => {
+      window.cancelAnimationFrame(focusClose);
       document.removeEventListener("keydown", handleKey);
       document.body.style.overflow = "";
+      previouslyFocusedRef.current?.focus?.();
+      previouslyFocusedRef.current = null;
     };
   }, [miniCartOpen, closeMiniCart]);
 
@@ -61,6 +129,10 @@ export const CartDrawer: React.FC = () => {
 
   const shippingProgress = Math.min(subtotal / FREE_SHIPPING_THRESHOLD, 1);
   const remaining = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
+  const itemCount = useMemo(
+    () => items.reduce((sum, i) => sum + i.qty, 0),
+    [items]
+  );
 
   const handleCheckout = useCallback(() => {
     closeMiniCart();
@@ -84,13 +156,15 @@ export const CartDrawer: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeMiniCart}
-            aria-hidden
+            aria-hidden="true"
           />
 
           <motion.aside
+            ref={panelRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
+            aria-describedby={descId}
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -104,13 +178,19 @@ export const CartDrawer: React.FC = () => {
               >
                 Your <em className="italic-accent">Parcel</em>
               </h2>
+              <p id={descId} className="sr-only">
+                {itemCount === 0
+                  ? "Your cart is empty."
+                  : `${itemCount} ${itemCount === 1 ? "item" : "items"} in cart. Subtotal ${formatINR(subtotal)}.`}
+              </p>
               <button
+                ref={closeButtonRef}
                 type="button"
                 onClick={closeMiniCart}
                 className="flex h-9 w-9 items-center justify-center rounded-full text-muted-sepia transition-colors hover:bg-linen hover:text-charcoal-ink focus-ring"
                 aria-label="Close cart"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
 
@@ -127,13 +207,14 @@ export const CartDrawer: React.FC = () => {
                 aria-valuenow={Math.round(shippingProgress * 100)}
                 aria-valuemin={0}
                 aria-valuemax={100}
-                aria-label="Progress toward free shipping"
+                aria-label="Progress toward complimentary shipping"
               >
                 <motion.div
                   className="ink-progress h-full"
                   initial={false}
                   animate={{ width: `${shippingProgress * 100}%` }}
                   transition={{ type: "spring", stiffness: 120, damping: 24 }}
+                  aria-hidden="true"
                 />
               </div>
             </div>
@@ -152,7 +233,7 @@ export const CartDrawer: React.FC = () => {
                     <div className="relative h-20 w-14 shrink-0 overflow-hidden rounded-[2px] bg-linen debossed">
                       <Image
                         src={i.snapshot.images?.[0] || "/placeholder.svg"}
-                        alt={i.snapshot.name}
+                        alt=""
                         fill
                         className="object-cover"
                         unoptimized
@@ -175,10 +256,14 @@ export const CartDrawer: React.FC = () => {
                             i.snapshot.salePrice ?? i.snapshot.price
                           )}
                         </span>
-                        <div className="flex items-center gap-2">
+                        <div
+                          className="flex items-center gap-2"
+                          role="group"
+                          aria-label={`Quantity for ${i.snapshot.name}`}
+                        >
                           <button
                             type="button"
-                            aria-label="Decrease quantity"
+                            aria-label={`Decrease quantity of ${i.snapshot.name}`}
                             className="flex h-7 w-7 items-center justify-center rounded-full border border-charcoal-ink/15 text-sm focus-ring"
                             onClick={() =>
                               remove(i.productId, {
@@ -189,12 +274,17 @@ export const CartDrawer: React.FC = () => {
                           >
                             −
                           </button>
-                          <span className="w-5 text-center font-sans text-sm tabular-nums">
+                          <span
+                            className="w-5 text-center font-sans text-sm tabular-nums"
+                            aria-live="polite"
+                            aria-atomic="true"
+                          >
+                            <span className="sr-only">Quantity </span>
                             {i.qty}
                           </span>
                           <button
                             type="button"
-                            aria-label="Increase quantity"
+                            aria-label={`Increase quantity of ${i.snapshot.name}`}
                             className="flex h-7 w-7 items-center justify-center rounded-full border border-charcoal-ink/15 text-sm focus-ring"
                             onClick={() =>
                               setQty(i.productId, i.qty + 1, {
@@ -217,6 +307,7 @@ export const CartDrawer: React.FC = () => {
                         })
                       }
                       className="self-start font-sans text-xs text-muted-sepia underline-offset-2 hover:underline focus-ring"
+                      aria-label={`Remove ${i.snapshot.name} from cart`}
                     >
                       Remove
                     </button>
@@ -251,6 +342,7 @@ export const CartDrawer: React.FC = () => {
                           setGiftMessage(e.target.value.slice(0, 200))
                         }
                         rows={3}
+                        maxLength={200}
                         placeholder="For someone who writes beautifully…"
                         className="mt-3 w-full resize-none rounded-md border border-charcoal-ink/10 bg-warm-off-white px-3 py-2 font-serif text-base italic leading-relaxed text-charcoal-ink placeholder:text-muted-sepia/50 focus:border-brass focus:outline-none focus:ring-1 focus:ring-brass"
                         aria-label="Gift message"
