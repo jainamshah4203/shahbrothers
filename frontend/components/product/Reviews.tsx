@@ -1,13 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { apiGet, apiPost } from "@/lib/api";
 import { useAuthStore } from "@/store/auth";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { framerTransition } from "@/lib/animations";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { cn } from "@/lib/utils";
 
 type Review = {
   _id: string;
   user: { name?: string; email?: string } | string;
-  rating: number; // 1..5
+  rating: number;
   comment: string;
   createdAt: string;
 };
@@ -16,9 +24,69 @@ type Props = {
   productId: string;
 };
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
+type ProductDetailTabsProps = {
+  productId: string;
+  description: ReactNode;
+  className?: string;
+};
+
+/** Animated description / reviews tabs for PDP (Motion + framerTransition). */
+export function ProductDetailTabs({ productId, description, className }: ProductDetailTabsProps) {
+  const [tab, setTab] = useState("description");
+  const prefersReduced = useReducedMotion();
+
+  return (
+    <Tabs
+      value={tab}
+      onValueChange={setTab}
+      className={cn("w-full", className)}
+    >
+      <TabsList className="mb-8 h-14 w-full justify-start overflow-x-auto rounded-none border-b border-charcoal-ink/10 bg-transparent">
+        <TabsTrigger
+          value="description"
+          className="rounded-none bg-transparent px-8 py-3 text-base shadow-none transition-all data-[state=active]:border-b-2 data-[state=active]:border-brass data-[state=active]:font-semibold data-[state=active]:text-charcoal-ink data-[state=active]:shadow-none"
+        >
+          Story & Details
+        </TabsTrigger>
+        <TabsTrigger
+          value="reviews"
+          className="rounded-none bg-transparent px-8 py-3 text-base shadow-none transition-all data-[state=active]:border-b-2 data-[state=active]:border-brass data-[state=active]:font-semibold data-[state=active]:text-charcoal-ink data-[state=active]:shadow-none"
+        >
+          Customer Reviews
+        </TabsTrigger>
+      </TabsList>
+
+      <div className="pt-4">
+        <AnimatePresence mode="wait" initial={false}>
+          {tab === "description" ? (
+            <motion.div
+              key="description"
+              role="tabpanel"
+              initial={prefersReduced ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={prefersReduced ? undefined : { opacity: 0, y: -8 }}
+              transition={framerTransition("medium")}
+              className="prose max-w-3xl font-sans text-lg leading-loose text-muted-sepia"
+            >
+              {description}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="reviews"
+              role="tabpanel"
+              initial={prefersReduced ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={prefersReduced ? undefined : { opacity: 0, y: -8 }}
+              transition={framerTransition("medium")}
+            >
+              <Reviews productId={productId} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </Tabs>
+  );
+}
 
 export default function Reviews({ productId }: Props) {
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -42,12 +110,10 @@ export default function Reviews({ productId }: Props) {
       setLoading(true);
       setError(null);
       try {
-        // Use the public product reviews endpoint only
         const data = await apiGet<{ reviews?: Review[] }>(`/products/${productId}/reviews`);
         const list = (data?.reviews || []) as Review[];
         if (!ignore) setReviews(list);
-      } catch (e: any) {
-        // Some backends may restrict non-admin access to /reviews; in that case, just show empty without alarming error
+      } catch (e: unknown) {
         if (!ignore) {
           console.warn("Reviews load failed", e);
           setReviews([]);
@@ -63,14 +129,13 @@ export default function Reviews({ productId }: Props) {
     };
   }, [productId]);
 
-  async function submitReview(e: React.FormEvent) {
+  async function handleSubmitReview(e: React.FormEvent) {
     e.preventDefault();
     if (!isAuthed) return;
     if (rating < 1 || rating > 5) return;
-    const payload = { productId, rating, comment } as any;
+    const payload = { productId, rating, comment };
     try {
-      // Try POST /products/:id/reviews else POST /reviews
-      let created: any = null;
+      let created: { review?: Review } | null = null;
       try {
         created = await apiPost<{ review: Review }>(`/products/${productId}/reviews`, payload);
       } catch {
@@ -80,61 +145,90 @@ export default function Reviews({ productId }: Props) {
       if (r) setReviews((prev) => [r, ...prev]);
       setComment("");
       setRating(5);
-    } catch (e: any) {
-      setError(e.message || "Failed to submit review");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to submit review";
+      setError(message);
     }
   }
 
   return (
-    <section className="animate-in fade-in duration-500">
+    <section>
       <div className="flex items-center gap-4">
-        <div className="text-4xl font-bold">{avg.toFixed(1)}</div>
+        <div className="font-serif text-4xl font-bold text-charcoal-ink">{avg.toFixed(1)}</div>
         <div>
           <StarRow value={avg} />
-          <div className="text-sm text-muted-foreground mt-1">Based on {reviews.length} Reviews</div>
+          <div className="mt-1 font-sans text-sm text-muted-sepia">
+            Based on {reviews.length} Reviews
+          </div>
         </div>
       </div>
 
-      {loading && <p className="mt-6 text-sm text-muted-foreground">Loading reviews…</p>}
-      {error && <p className="mt-6 text-sm text-destructive">{error}</p>}
+      {loading && <p className="mt-6 font-sans text-sm text-muted-sepia">Loading reviews…</p>}
+      {error && <p className="mt-6 font-sans text-sm text-terracotta">{error}</p>}
 
       {reviews.length === 0 && !loading ? (
-        <p className="mt-8 text-sm text-muted-foreground">No reviews yet. Be the first to review!</p>
+        <p className="mt-8 font-sans text-sm text-muted-sepia">
+          No reviews yet. Be the first to review!
+        </p>
       ) : (
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {reviews.map((r) => (
-            <Card key={r._id} className="p-5 hover:shadow-elevation-1 transition-shadow bg-background">
-              <div className="flex items-center justify-between mb-3">
-                <div className="font-medium text-sm">{typeof r.user === 'string' ? r.user : (r.user?.name || r.user?.email || 'User')}</div>
+            <Card
+              key={r._id}
+              className="border-charcoal-ink/8 bg-cream p-5 paper-grain transition-shadow hover:shadow-paper"
+            >
+              <div className="mb-3 flex items-center justify-between">
+                <div className="font-sans text-sm font-medium text-charcoal-ink">
+                  {typeof r.user === "string"
+                    ? r.user
+                    : r.user?.name || r.user?.email || "User"}
+                </div>
                 <StarRow value={r.rating} />
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{r.comment}</p>
-              <div className="mt-4 text-xs text-muted-foreground/60">{new Date(r.createdAt).toLocaleDateString()}</div>
+              <p className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-muted-sepia">
+                {r.comment}
+              </p>
+              <div className="mt-4 font-sans text-xs text-muted-sepia/70">
+                {new Date(r.createdAt).toLocaleDateString()}
+              </div>
             </Card>
           ))}
         </div>
       )}
 
-      {/* Write review */}
-      <div className="mt-12 p-6 bg-muted/30 rounded-xl border">
-        <h3 className="text-lg font-semibold mb-4">Write a Review</h3>
+      <div className="mt-12 rounded-xl border border-charcoal-ink/8 bg-linen/50 p-6 paper-grain">
+        <h3 className="mb-4 font-serif text-lg font-semibold text-charcoal-ink">Write a Review</h3>
         {!mounted ? (
           <div className="h-10" />
         ) : !isAuthed ? (
-          <p className="text-sm text-muted-foreground">
-            Please <a href={`/auth/login?redirect=/products/id/${productId}`} className="underline font-medium hover:text-foreground transition-colors">sign in</a> to write a review.
+          <p className="font-sans text-sm text-muted-sepia">
+            Please{" "}
+            <a
+              href={`/auth/login?redirect=/products/id/${productId}`}
+              className="font-medium text-fountain-navy underline underline-offset-2 transition-colors hover:text-charcoal-ink"
+            >
+              sign in
+            </a>{" "}
+            to write a review.
           </p>
         ) : (
-          <form onSubmit={submitReview} className="space-y-4 max-w-xl">
+          <form onSubmit={handleSubmitReview} className="max-w-xl space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Rating</label>
+              <label className="mb-2 block font-sans text-sm font-medium text-charcoal-ink">
+                Rating
+              </label>
               <div className="flex items-center gap-2">
-                {([1,2,3,4,5] as const).map((n) => (
+                {([1, 2, 3, 4, 5] as const).map((n) => (
                   <button
                     key={n}
                     type="button"
                     onClick={() => setRating(n)}
-                    className={`h-10 w-10 rounded-full border flex items-center justify-center text-lg transition-all duration-300 hover:scale-110 ${rating >= n ? 'border-yellow-500 bg-yellow-50 text-yellow-500' : 'border-border text-muted-foreground hover:border-yellow-200'}`}
+                    className={cn(
+                      "flex h-10 w-10 items-center justify-center rounded-full border text-lg transition-all duration-300 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass",
+                      rating >= n
+                        ? "border-brass bg-cream text-brass"
+                        : "border-charcoal-ink/15 text-muted-sepia hover:border-brass/40"
+                    )}
                     aria-label={`${n} star`}
                   >
                     ★
@@ -143,13 +237,16 @@ export default function Reviews({ productId }: Props) {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Review</label>
+              <label className="mb-2 block font-sans text-sm font-medium text-charcoal-ink">
+                Review
+              </label>
               <Textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 rows={4}
                 placeholder="Share details of your experience..."
                 required
+                className="border-charcoal-ink/15 bg-warm-off-white focus-visible:ring-brass"
               />
             </div>
             <Button type="submit">Submit Review</Button>
@@ -165,11 +262,15 @@ function StarRow({ value }: { value: number }) {
   const half = value - full >= 0.5;
   const total = 5;
   return (
-    <div className="flex items-center gap-0.5 text-yellow-500">
+    <div className="flex items-center gap-0.5 text-brass">
       {Array.from({ length: total }).map((_, i) => {
         if (i < full) return <span key={i}>★</span>;
         if (i === full && half) return <span key={i}>☆</span>;
-        return <span key={i} className="text-muted-foreground">☆</span>;
+        return (
+          <span key={i} className="text-muted-sepia/40">
+            ☆
+          </span>
+        );
       })}
     </div>
   );
