@@ -4,32 +4,36 @@ import React, { useEffect, useState } from "react";
 import { motion, useSpring } from "framer-motion";
 import { useDeviceCapability } from "@/hooks/useDeviceCapability";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { shouldEnableCustomCursor } from "@/lib/performance";
 
 /**
  * Animated custom cursor for desktop users.
  * Features a dot that follows the mouse exactly, and a ring that follows with a spring effect.
- * Hides automatically over interactive elements (if desired) or modifies state.
- * Disabled on mobile and touch devices.
+ * Disabled on mobile, touch, low-tier devices, and reduced motion.
  */
 export default function AnimatedCursor() {
-  const { isMobile } = useDeviceCapability();
+  const { isMobile, isTouch, tier } = useDeviceCapability();
   const prefersReduced = useReducedMotion();
-  
+  const enabled = shouldEnableCustomCursor({
+    tier,
+    isMobile,
+    isTouch,
+    prefersReducedMotion: prefersReduced,
+  });
+
   const [isVisible, setIsVisible] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
 
-  // Use springs for smooth following
   const cursorX = useSpring(-100, { stiffness: 1000, damping: 50, mass: 0.1 });
   const cursorY = useSpring(-100, { stiffness: 1000, damping: 50, mass: 0.1 });
-  
+
   const ringX = useSpring(-100, { stiffness: 250, damping: 30, mass: 0.5 });
   const ringY = useSpring(-100, { stiffness: 250, damping: 30, mass: 0.5 });
 
   useEffect(() => {
-    if (isMobile || prefersReduced) return;
+    if (!enabled) return;
 
-    // We add a class to body to hide the native cursor
     document.documentElement.classList.add("custom-cursor");
 
     const moveCursor = (e: MouseEvent) => {
@@ -37,8 +41,8 @@ export default function AnimatedCursor() {
       cursorY.set(e.clientY);
       ringX.set(e.clientX);
       ringY.set(e.clientY);
-      
-      if (!isVisible) setIsVisible(true);
+
+      setIsVisible((prev) => (prev ? prev : true));
     };
 
     const handleMouseLeave = () => setIsVisible(false);
@@ -46,7 +50,6 @@ export default function AnimatedCursor() {
     const handleMouseDown = () => setIsClicking(true);
     const handleMouseUp = () => setIsClicking(false);
 
-    // Interactive element detection
     const handleElementEnter = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (
@@ -70,8 +73,6 @@ export default function AnimatedCursor() {
     document.addEventListener("mouseenter", handleMouseEnter);
     window.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mouseup", handleMouseUp);
-    
-    // Use event delegation for hover states
     document.addEventListener("mouseover", handleElementEnter);
     document.addEventListener("mouseout", handleElementLeave);
 
@@ -85,24 +86,22 @@ export default function AnimatedCursor() {
       document.removeEventListener("mouseover", handleElementEnter);
       document.removeEventListener("mouseout", handleElementLeave);
     };
-  }, [isMobile, prefersReduced, cursorX, cursorY, ringX, ringY, isVisible]);
+  }, [enabled, cursorX, cursorY, ringX, ringY]);
 
-  if (isMobile || prefersReduced || !isVisible) return null;
+  if (!enabled || !isVisible) return null;
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[9999]">
-      {/* Inner Dot */}
       <motion.div
         className="fixed top-0 left-0 w-2 h-2 bg-foreground rounded-full -ml-1 -mt-1 mix-blend-difference"
         style={{ x: cursorX, y: cursorY }}
         animate={{
           scale: isClicking ? 0.5 : isHovering ? 0.5 : 1,
-          opacity: isHovering ? 0 : 1
+          opacity: isHovering ? 0 : 1,
         }}
         transition={{ type: "spring", stiffness: 500, damping: 28 }}
       />
-      
-      {/* Outer Ring */}
+
       <motion.div
         className="fixed top-0 left-0 w-8 h-8 rounded-full border border-foreground/30 -ml-4 -mt-4 mix-blend-difference"
         style={{ x: ringX, y: ringY }}
